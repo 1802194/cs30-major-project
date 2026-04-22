@@ -6,7 +6,7 @@
 // - describe what you did to take this project "above and beyond"
 
 let stage = {
-  1:{"pieces":[["box",0,0,0,200,10,200],["box",100,0,100,200,10,200]]},
+  1:{"pieces":[["box",120,-100,-130,200,75,200],["box",0,0,0,200,10,200],["box",200,0,100,200,10,200]]},
   2:{},
   3:{},
 };
@@ -39,15 +39,14 @@ function draw() {
   orbitControl();
   myFriend.display();
   myFriend.update();
+  myFriend.isOnFloor = false;
   for (let box = 0; box < myWonderfulBoxes.length; box++) {
     myWonderfulBoxes[box].display();
     myFriend.checkCollision(myWonderfulBoxes[box]);
   }
-
   let cam_x = cam.centerX - cam.eyeX;
   let cam_z = cam.centerZ - cam.eyeZ;
   let yaw = atan2(cam_x, cam_z);
-  console.log(yaw);
   angle = yaw;
   // *(360/PI) for degrees btw
 }
@@ -57,12 +56,16 @@ class Player {
     this.x = x;
     this.y = y;
     this.z = z;
+    this.airtime = 0;
     this.sizeX = sizeX;
     this.sizeY = sizeY;
     this.sizeZ = sizeZ;
     this.speed = 3;
-    this.fallingspeed = 5;
+    this.fallingspeed = 8;
+    this.airacceleration = 0.75;
+    this.airtime = 0;
     this.isOnFloor = false;
+    this.lastPosition = {x: this.x, y: this.y, z: this.z};
   }
 
   display() {
@@ -75,9 +78,14 @@ class Player {
   update() {
     //Gravity
     if (!this.isOnFloor) {
-      this.y += this.fallingspeed;
+      this.y += this.fallingspeed + this.airtime;
+      this.airtime += this.airacceleration;
     }
-    
+    else {
+      this.airtime = 0;
+    }
+
+    this.lastPosition = {x: this.x, y: this.y, z: this.z};
 
     // W
     if (keyIsDown(87)) {
@@ -102,11 +110,23 @@ class Player {
   }
 
   checkCollision(colBox) {
-    if (this.y + this.sizeY < colBox.y + colBox.sizeY && this.y + this.sizeY > colBox.y - 7 && (this.x + this.sizeX/2 > colBox.x - colBox.sizeX && this.x - this.sizeX/2 < colBox.x + colBox.sizeX/2) && (this.z + this.sizeZ/2 > colBox.z - colBox.sizeZ && this.z - this.sizeZ/2 < colBox.z + colBox.sizeZ/2)) {
+    if (this.y + this.sizeY < colBox.y + colBox.sizeY && 
+      this.y + this.sizeY > colBox.y - 7 && 
+      (this.x + this.sizeX/2 > colBox.x - colBox.sizeX/2 && 
+      this.x - this.sizeX/2 < colBox.x + colBox.sizeX/2) &&
+      (this.z + this.sizeZ/2 > colBox.z - colBox.sizeZ/2 &&
+      this.z - this.sizeZ/2 < colBox.z + colBox.sizeZ/2)) {
       this.isOnFloor = true;
     }
-    else {
-      this.isOnFloor = false;
+
+    if (this.y + this.sizeY > colBox.y + colBox.sizeY &&
+      (this.x + this.sizeX/2 > colBox.x - colBox.sizeX/2 && 
+      this.x - this.sizeX/2 < colBox.x + colBox.sizeX/2) &&
+      (this.z + this.sizeZ/2 > colBox.z - colBox.sizeZ/2 &&
+      this.z - this.sizeZ/2 < colBox.z + colBox.sizeZ/2)) {
+      this.x = this.lastPosition.x;
+      this.y = this.lastPosition.y;
+      this.z = this.lastPosition.z;
     }
   }
 }
@@ -122,7 +142,9 @@ class Box {
   }
 
   display() {
+    push();
     translate(this.x, this.y, this.z);
     box(this.sizeX, this.sizeY, this.sizeZ);
+    pop();
   }
 }
