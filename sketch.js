@@ -6,7 +6,7 @@
 // - describe what you did to take this project "above and beyond"
 
 let stage = {
-  1:{"pieces":[["box",120,-100,-130,200,75,200],["box",0,0,0,200,10,200],["box",200,0,100,200,10,200]]},
+  1:{"pieces":[["box",120,-100,-130,200,75,200],["box",0,0,0,700,10,700]]},
   2:{},
   3:{},
 };
@@ -124,9 +124,12 @@ class Player {
       this.x - this.sizeX/2 < colBox.x + colBox.sizeX/2) &&
       (this.z + this.sizeZ/2 > colBox.z - colBox.sizeZ/2 &&
       this.z - this.sizeZ/2 < colBox.z + colBox.sizeZ/2)) {
-      this.x = this.lastPosition.x;
-      this.y = this.lastPosition.y;
-      this.z = this.lastPosition.z;
+      if (this.z > colBox.z + colBox.sizeX / 2 || this.z < colBox.z - colBox.sizeX / 2) {
+        this.z = this.lastPosition.z;
+      } 
+      if (this.x < colBox.x - colBox.sizeZ / 2 || this.x > colBox.x + colBox.sizeZ / 2) {
+        this.x = this.lastPosition.x;
+      }
     }
   }
 }

@@ -5,13 +5,13 @@ Captain Toad
 -2-3 levels
 -3D maps
 -3D player model
--Player animations
 -Actual end goal item
 -Doors
 -Enemies/Obsticales
 -Menu
 
 ## Nice to Have
+-Player animations
 -mmmmmmmmmoving pplatforms :scared:
 -Music
 -More Levels?
