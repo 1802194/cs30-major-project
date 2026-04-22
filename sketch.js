@@ -5,6 +5,8 @@
 // Extra for Experts:
 // - describe what you did to take this project "above and beyond"
 
+//https://threejs.org/docs/#AnimationMixer
+
 let stage = {
   1:{"pieces":[["box",120,-100,-130,200,75,200],["box",0,0,0,700,10,700]]},
   2:{},

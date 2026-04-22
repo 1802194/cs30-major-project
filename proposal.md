@@ -5,21 +5,18 @@ Captain Toad
 -2-3 levels
 -3D maps
 -3D player model
+-Player animations
 -Actual end goal item
 -Doors
--Enemies/Obsticales
+-Enemies/Obsticles
 -Menu
 
 ## Nice to Have
--Player animations
--mmmmmmmmmoving pplatforms :scared:
+-moving platforms
 -Music
 -More Levels?
 -Fishing Minigame (Tyler's Idea not mine leave me out of this)
--Achievements ooooooo
+-Achievements
 -More Cool Mechanics
 -Snow Level haha (my(awesome's) iferadideaidea)
--Water Level (Stupid Person(Tyler)'s idea)
--Mario
--Wait we can't add mario
--Mayro
+-Water Level (Tyler's idea)
