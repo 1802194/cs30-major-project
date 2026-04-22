@@ -12,12 +12,17 @@ let stage = {
 };
 let level = 1;
 let myWonderfulBoxes = [];
-let myFriend;
+let myFriend, cam, font, angle, pg;
+
+function preload() {
+  font = loadFont("/SeagirlDreams.otf");
+}
 
 function setup() {
-  createCanvas(windowWidth, windowHeight, WEBGL);
+  createCanvas(1280, 720, WEBGL);
   myFriend = new Player(0,-120,0,40,70,40);
   createLevel();
+  cam = _renderer._curCamera; 
 }
 
 function createLevel() {
@@ -38,6 +43,13 @@ function draw() {
     myWonderfulBoxes[box].display();
     myFriend.checkCollision(myWonderfulBoxes[box]);
   }
+
+  let cam_x = cam.centerX - cam.eyeX;
+  let cam_z = cam.centerZ - cam.eyeZ;
+  let yaw = atan2(cam_x, cam_z);
+  console.log(yaw);
+  angle = yaw;
+  // *(360/PI) for degrees btw
 }
 
 class Player {
@@ -48,7 +60,7 @@ class Player {
     this.sizeX = sizeX;
     this.sizeY = sizeY;
     this.sizeZ = sizeZ;
-    this.speed = 5;
+    this.speed = 3;
     this.fallingspeed = 5;
     this.isOnFloor = false;
   }
@@ -66,28 +78,31 @@ class Player {
       this.y += this.fallingspeed;
     }
     
-    //Movement
-    //w
+
+    // W
     if (keyIsDown(87)) {
-      this.z -= this.speed;
+      this.x += sin(angle)*this.speed;
+      this.z += cos(angle)*this.speed;
     }
-    //a
-    if (keyIsDown(65)) {
-      this.z -= this.speed;
-    }
-    //s
+    // S
     if (keyIsDown(83)) {
-      this.z -= this.speed;
+      this.x -= sin(angle)*this.speed;
+      this.z -= cos(angle)*this.speed;
     }
-    //d
+    // A
     if (keyIsDown(68)) {
-      this.z -= this.speed;
+      this.x -= cos(angle)*this.speed;
+      this.z += sin(angle)*this.speed;
+    }
+    // D
+    if (keyIsDown(65)) {
+      this.x += cos(angle)*this.speed;
+      this.z -= sin(angle)*this.speed;
     }
   }
 
   checkCollision(colBox) {
-    if (this.y + this.sizeY < colBox.y && this.y + this.sizeY > colBox.y - 7 && (this.x > colBox.x - colBox.sizeX && this.x < colBox.x + colBox.sizeX) && (this.z > colBox.z - colBox.sizeZ && this.z < colBox.z + colBox.sizeZ)) {
-      console.log("haha look at me im stading");
+    if (this.y + this.sizeY < colBox.y + colBox.sizeY && this.y + this.sizeY > colBox.y - 7 && (this.x + this.sizeX/2 > colBox.x - colBox.sizeX && this.x - this.sizeX/2 < colBox.x + colBox.sizeX/2) && (this.z + this.sizeZ/2 > colBox.z - colBox.sizeZ && this.z - this.sizeZ/2 < colBox.z + colBox.sizeZ/2)) {
       this.isOnFloor = true;
     }
     else {
