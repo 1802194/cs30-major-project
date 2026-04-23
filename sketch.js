@@ -6,15 +6,24 @@
 // - describe what you did to take this project "above and beyond"
 
 //https://threejs.org/docs/#AnimationMixer
-
-let stage = {
-  1:{"pieces":[["box",120,-100,-130,200,75,200],["box",0,0,0,700,10,700]]},
-  2:{},
-  3:{},
-};
+let stage = {};
 let level = 1;
 let myWonderfulBoxes = [];
 let myFriend, cam, font, angle, pg;
+let player_spawn_cords = [0,0,0];
+
+function keyPressed() {
+  if (key === "q") {
+    saveJSON(stage);
+  }
+  if (key === "e") {
+    createLevel();
+  }
+  if (key === "r") {
+    level += 1;
+    createLevel();
+  }
+}
 
 function preload() {
   font = loadFont("/SeagirlDreams.otf");
@@ -22,35 +31,50 @@ function preload() {
 
 function setup() {
   createCanvas(1280, 720, WEBGL);
-  myFriend = new Player(0,-120,0,40,70,40);
   createLevel();
   cam = _renderer._curCamera; 
 }
 
-function createLevel() {
+async function createLevel() {
+  stage = loadJSON("levels/level"+level+".json", onLevelLoad);
+}
+
+function onLevelLoad() {
   myWonderfulBoxes = [];
-  let badword = stage[level]["pieces"];
-  for (let piece = 0; piece < stage[level]["pieces"].length; piece++) {
-    let boxexclaimationmark = new Box(badword[piece][1],badword[piece][2],badword[piece][3],badword[piece][4],badword[piece][5],badword[piece][6]);
-    myWonderfulBoxes.push(boxexclaimationmark);
+  let badword = stage["pieces"];
+  for (let piece = 0; piece < badword.length; piece++) {
+    if (badword[piece][0] === "box") {
+      let boxexclaimationmark = new Box(badword[piece][1],badword[piece][2],badword[piece][3],badword[piece][4],badword[piece][5],badword[piece][6]);
+      myWonderfulBoxes.push(boxexclaimationmark);
+    }
+    if (badword[piece][0] === "player_spawn") {
+      // could've done a for loop for this but.... ehhhhhhhhhhhh im lazy ill do it later (if i remember) - [starzz (aurora)]
+      player_spawn_cords[0] = badword[piece][1];
+      player_spawn_cords[1] = badword[piece][2];
+      player_spawn_cords[2] = badword[piece][3];
+    }
   }
+  myFriend = undefined;
+  myFriend = new Player(player_spawn_cords[0],player_spawn_cords[1],player_spawn_cords[2],40,70,40);
 }
 
 function draw() {
   background(220);
   orbitControl();
-  myFriend.display();
-  myFriend.update();
-  myFriend.isOnFloor = false;
-  for (let box = 0; box < myWonderfulBoxes.length; box++) {
-    myWonderfulBoxes[box].display();
-    myFriend.checkCollision(myWonderfulBoxes[box]);
+  if (myFriend !== undefined) {
+    myFriend.display();
+    myFriend.update();
+    myFriend.isOnFloor = false;
+    for (let box = 0; box < myWonderfulBoxes.length; box++) {
+      myWonderfulBoxes[box].display();
+      myFriend.checkCollision(myWonderfulBoxes[box]);
+    }
+    let cam_x = cam.centerX - cam.eyeX;
+    let cam_z = cam.centerZ - cam.eyeZ;
+    let yaw = atan2(cam_x, cam_z);
+    angle = yaw;
+    // *(360/PI) for degrees btw
   }
-  let cam_x = cam.centerX - cam.eyeX;
-  let cam_z = cam.centerZ - cam.eyeZ;
-  let yaw = atan2(cam_x, cam_z);
-  angle = yaw;
-  // *(360/PI) for degrees btw
 }
 
 class Player {
