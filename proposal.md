@@ -6,7 +6,7 @@ Captain Toad
 - 3D maps
 - Sound effects
 - Actual end goal item
-- Doors
+- Doors/teleport
 - Enemies/Obsticles
 - Menu
 
