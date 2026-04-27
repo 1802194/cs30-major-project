@@ -47,7 +47,7 @@ function onLevelLoad() {
       let boxexclaimationmark = new Box(badword[piece][1],badword[piece][2],badword[piece][3],badword[piece][4],badword[piece][5],badword[piece][6]);
       myWonderfulBoxes.push(boxexclaimationmark);
     }
-    if (badword[piece][0] === "player_spawn") {
+    else if (badword[piece][0] === "player_spawn") {
       // could've done a for loop for this but.... ehhhhhhhhhhhh im lazy ill do it later (if i remember) - [starzz (aurora)]
       player_spawn_cords[0] = badword[piece][1];
       player_spawn_cords[1] = badword[piece][2];
@@ -150,10 +150,10 @@ class Player {
       this.x - this.sizeX/2 < colBox.x + colBox.sizeX/2) &&
       (this.z + this.sizeZ/2 > colBox.z - colBox.sizeZ/2 &&
       this.z - this.sizeZ/2 < colBox.z + colBox.sizeZ/2)) {
-      if (this.z > colBox.z + colBox.sizeX / 2 || this.z < colBox.z - colBox.sizeX / 2) {
+      if (this.z > colBox.z + colBox.sizeZ / 2 || this.z < colBox.z - colBox.sizeZ / 2) {
         this.z = this.lastPosition.z;
       } 
-      if (this.x < colBox.x - colBox.sizeZ / 2 || this.x > colBox.x + colBox.sizeZ / 2) {
+      if (this.x < colBox.x - colBox.sizeX / 2 || this.x > colBox.x + colBox.sizeX / 2) {
         this.x = this.lastPosition.x;
       }
     }
