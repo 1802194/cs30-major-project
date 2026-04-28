@@ -173,12 +173,17 @@ class Player {
     push();
     fill("blue");
     translate(colBox.x, colBox.y + colBox.sizeY/2, colBox.z);
-    box(10, 10, 10);
+    box(colBox.sizeX, 1, colBox.sizeZ);
     pop();
     push();
     fill("green");
     translate(colBox.x, colBox.y - colBox.sizeY/2, colBox.z);
-    box(10, 10, 10);
+    box(colBox.sizeX, 1, colBox.sizeZ);
+    pop();
+    push();
+    fill("purple");
+    translate(colBox.x, colBox.y, colBox.z);
+    box(colBox.sizeX-1, colBox.sizeY, colBox.sizeZ+1);
     pop();
   }
 }
