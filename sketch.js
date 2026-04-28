@@ -26,7 +26,7 @@ function keyPressed() {
 }
 
 function preload() {
-  font = loadFont("/SeagirlDreams.otf");
+  font = loadFont("SeagirlDreams.otf");
 }
 
 function setup() {
@@ -136,7 +136,7 @@ class Player {
   }
 
   checkCollision(colBox) {
-    if (this.y + this.sizeY < colBox.y + colBox.sizeY && 
+    if (this.y - this.sizeY < colBox.y + colBox.sizeY && 
       this.y + this.sizeY > colBox.y - 7 && 
       (this.x + this.sizeX/2 > colBox.x - colBox.sizeX/2 && 
       this.x - this.sizeX/2 < colBox.x + colBox.sizeX/2) &&
@@ -144,8 +144,7 @@ class Player {
       this.z - this.sizeZ/2 < colBox.z + colBox.sizeZ/2)) {
       this.isOnFloor = true;
     }
-
-    if (this.y + this.sizeY > colBox.y + colBox.sizeY &&
+    if (this.y - this.sizeY < colBox.y + colBox.sizeY - 7 &&
       (this.x + this.sizeX/2 > colBox.x - colBox.sizeX/2 && 
       this.x - this.sizeX/2 < colBox.x + colBox.sizeX/2) &&
       (this.z + this.sizeZ/2 > colBox.z - colBox.sizeZ/2 &&
