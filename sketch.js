@@ -136,15 +136,16 @@ class Player {
   }
 
   checkCollision(colBox) {
-    if (this.y - this.sizeY < colBox.y + colBox.sizeY && 
-      this.y + this.sizeY > colBox.y - 7 && 
+    if (this.y + this.sizeY < colBox.y - colBox.sizeY/2 &&  // checks if above the platform
+      this.y + this.sizeY > colBox.y - 15 && // checks if right above the platform or if just above it in general
       (this.x + this.sizeX/2 > colBox.x - colBox.sizeX/2 && 
       this.x - this.sizeX/2 < colBox.x + colBox.sizeX/2) &&
       (this.z + this.sizeZ/2 > colBox.z - colBox.sizeZ/2 &&
       this.z - this.sizeZ/2 < colBox.z + colBox.sizeZ/2)) {
       this.isOnFloor = true;
+      this.y = colBox.y - colBox.sizeY - this.sizeY;
     }
-    if (this.y - this.sizeY < colBox.y + colBox.sizeY - 7 &&
+    if (this.y + this.sizeY > colBox.y - colBox.sizeY/2 && // checks if below the platform's base
       (this.x + this.sizeX/2 > colBox.x - colBox.sizeX/2 && 
       this.x - this.sizeX/2 < colBox.x + colBox.sizeX/2) &&
       (this.z + this.sizeZ/2 > colBox.z - colBox.sizeZ/2 &&
@@ -156,6 +157,29 @@ class Player {
         this.x = this.lastPosition.x;
       }
     }
+
+
+    // HITBOX COLLISION SPOTS
+    push();
+    fill("red");
+    translate(this.x, this.y + this.sizeY, this.z);
+    box(10, 10, 10);
+    pop();
+    push();
+    fill("yellow");
+    translate(this.x, this.y - this.sizeY, this.z);
+    box(10, 10, 10);
+    pop();
+    push();
+    fill("blue");
+    translate(colBox.x, colBox.y + colBox.sizeY/2, colBox.z);
+    box(10, 10, 10);
+    pop();
+    push();
+    fill("green");
+    translate(colBox.x, colBox.y - colBox.sizeY/2, colBox.z);
+    box(10, 10, 10);
+    pop();
   }
 }
 
