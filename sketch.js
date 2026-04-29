@@ -9,6 +9,7 @@
 let stage = {};
 let level = 1;
 let myWonderfulBoxes = [];
+let allStars = [];
 let myFriend, cam, font, angle, pg;
 let player_spawn_cords = [0,0,0];
 
@@ -41,6 +42,7 @@ async function createLevel() {
 
 function onLevelLoad() {
   myWonderfulBoxes = [];
+
   let badword = stage["pieces"];
   for (let piece = 0; piece < badword.length; piece++) {
     if (badword[piece][0] === "box") {
@@ -52,6 +54,10 @@ function onLevelLoad() {
       player_spawn_cords[0] = badword[piece][1];
       player_spawn_cords[1] = badword[piece][2];
       player_spawn_cords[2] = badword[piece][3];
+    }
+    else if (badword[piece][0] === "star") {
+      let newStar = new Star(badword[piece][1],badword[piece][2],badword[piece][3],badword[piece][4]);
+      allStars.push(newStar);
     }
   }
   myFriend = undefined;
@@ -68,6 +74,9 @@ function draw() {
     for (let box = 0; box < myWonderfulBoxes.length; box++) {
       myWonderfulBoxes[box].display();
       myFriend.checkCollision(myWonderfulBoxes[box]);
+    }
+    for (let stars = 0; stars < allStars.length; stars++) {
+      allStars[stars].display();
     }
     let cam_x = cam.centerX - cam.eyeX;
     let cam_z = cam.centerZ - cam.eyeZ;
@@ -185,6 +194,11 @@ class Player {
     translate(colBox.x, colBox.y, colBox.z);
     box(colBox.sizeX-1, colBox.sizeY, colBox.sizeZ+1);
     pop();
+    push();
+    fill("orange");
+    translate(colBox.x, colBox.y, colBox.z);
+    box(colBox.sizeX+1, colBox.sizeY, colBox.sizeZ-1);
+    pop();
   }
 }
 
@@ -202,6 +216,22 @@ class Box {
     push();
     translate(this.x, this.y, this.z);
     box(this.sizeX, this.sizeY, this.sizeZ);
+    pop();
+  }
+}
+
+class Star {
+  constructor(x, y, z) {
+    this.x = x;
+    this.y = y;
+    this.z = z;
+    this.radius = 25;
+  }
+
+  display() {
+    push();
+    translate(this.x, this.y, this.z);
+    sphere(this.radius);
     pop();
   }
 }
