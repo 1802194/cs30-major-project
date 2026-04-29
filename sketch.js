@@ -41,43 +41,57 @@ async function createLevel() {
 }
 
 function onLevelLoad() {
+  // This array stores all of the objects present on he field
   myWonderfulBoxes = [];
 
   let badword = stage["pieces"];
+  // Checks the json for the level to know what objects need to be added
   for (let piece = 0; piece < badword.length; piece++) {
+    // Creates a rectangular prism based on the position and dimensions in the json
     if (badword[piece][0] === "box") {
       let boxexclaimationmark = new Box(badword[piece][1],badword[piece][2],badword[piece][3],badword[piece][4],badword[piece][5],badword[piece][6]);
       myWonderfulBoxes.push(boxexclaimationmark);
     }
     else if (badword[piece][0] === "player_spawn") {
+      // Determines the player's spawn point
       // could've done a for loop for this but.... ehhhhhhhhhhhh im lazy ill do it later (if i remember) - [starzz (aurora)]
       player_spawn_cords[0] = badword[piece][1];
       player_spawn_cords[1] = badword[piece][2];
       player_spawn_cords[2] = badword[piece][3];
     }
     else if (badword[piece][0] === "star") {
+      // Creates a star at the specified position to be collected by the player
       let newStar = new Star(badword[piece][1],badword[piece][2],badword[piece][3],badword[piece][4]);
       allStars.push(newStar);
     }
   }
   myFriend = undefined;
+  // Spawns in the player to the scene
   myFriend = new Player(player_spawn_cords[0],player_spawn_cords[1],player_spawn_cords[2],40,70,40);
 }
 
 function draw() {
   background(220);
+  // Allows camera control
   orbitControl();
+
+  // Controls the player
   if (myFriend !== undefined) {
     myFriend.display();
     myFriend.update();
     myFriend.isOnFloor = false;
+
+    // Shows the boxes and checks if the player is colliding with them
     for (let box = 0; box < myWonderfulBoxes.length; box++) {
       myWonderfulBoxes[box].display();
       myFriend.checkCollision(myWonderfulBoxes[box]);
     }
+
+    // Shows the stars
     for (let stars = 0; stars < allStars.length; stars++) {
       allStars[stars].display();
     }
+
     let cam_x = cam.centerX - cam.eyeX;
     let cam_z = cam.centerZ - cam.eyeZ;
     let yaw = atan2(cam_x, cam_z);
@@ -103,6 +117,7 @@ class Player {
     this.lastPosition = {x: this.x, y: this.y, z: this.z};
   }
 
+  // Shows the player when called
   display() {
     push();
     translate(this.x, this.y, this.z);
@@ -122,6 +137,7 @@ class Player {
 
     this.lastPosition = {x: this.x, y: this.y, z: this.z};
 
+    // Keyboard controls for player movement
     // W
     if (keyIsDown(87)) {
       this.x += sin(angle)*this.speed;
@@ -144,6 +160,7 @@ class Player {
     }
   }
 
+  // Detects collision between the player and any boxes to stop the player from running through walls
   checkCollision(colBox) {
     if (this.y + this.sizeY < colBox.y - colBox.sizeY/2 &&  // checks if above the platform
       this.y + this.sizeY > colBox.y - 15 && // checks if right above the platform or if just above it in general
@@ -169,31 +186,37 @@ class Player {
 
 
     // HITBOX COLLISION SPOTS
+    // Player feet
     push();
     fill("red");
     translate(this.x, this.y + this.sizeY, this.z);
     box(10, 10, 10);
     pop();
+    // Player head
     push();
     fill("yellow");
     translate(this.x, this.y - this.sizeY, this.z);
     box(10, 10, 10);
     pop();
+    // Bottom of boxes
     push();
     fill("blue");
     translate(colBox.x, colBox.y + colBox.sizeY/2, colBox.z);
     box(colBox.sizeX, 1, colBox.sizeZ);
     pop();
+    // Top of boxes
     push();
     fill("green");
     translate(colBox.x, colBox.y - colBox.sizeY/2, colBox.z);
     box(colBox.sizeX, 1, colBox.sizeZ);
     pop();
+    // Sides of boxes on the XY plane
     push();
     fill("purple");
     translate(colBox.x, colBox.y, colBox.z);
     box(colBox.sizeX-1, colBox.sizeY, colBox.sizeZ+1);
     pop();
+    // Sides of boxes on the ZY plane
     push();
     fill("orange");
     translate(colBox.x, colBox.y, colBox.z);
@@ -212,6 +235,7 @@ class Box {
     this.sizeZ = sizeZ;
   }
 
+  // Shows the box when called
   display() {
     push();
     translate(this.x, this.y, this.z);
@@ -228,6 +252,7 @@ class Star {
     this.radius = 25;
   }
 
+  // Shows the star when called
   display() {
     push();
     translate(this.x, this.y, this.z);
