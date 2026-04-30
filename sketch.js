@@ -12,6 +12,7 @@ let myWonderfulBoxes = [];
 let allStars = [];
 let myFriend, cam, font, angle, pg;
 let player_spawn_cords = [0,0,0];
+let showHitboxes = false;
 
 function keyPressed() {
   if (key === "q") {
@@ -23,6 +24,9 @@ function keyPressed() {
   if (key === "r") {
     level += 1;
     createLevel();
+  }
+  if (key === "b") {
+    showHitboxes = !showHitboxes;
   }
 }
 
@@ -186,42 +190,44 @@ class Player {
 
 
     // HITBOX COLLISION SPOTS
-    // Player feet
-    push();
-    fill("red");
-    translate(this.x, this.y + this.sizeY, this.z);
-    box(10, 10, 10);
-    pop();
-    // Player head
-    push();
-    fill("yellow");
-    translate(this.x, this.y - this.sizeY, this.z);
-    box(10, 10, 10);
-    pop();
-    // Bottom of boxes
-    push();
-    fill("blue");
-    translate(colBox.x, colBox.y + colBox.sizeY/2, colBox.z);
-    box(colBox.sizeX, 1, colBox.sizeZ);
-    pop();
-    // Top of boxes
-    push();
-    fill("green");
-    translate(colBox.x, colBox.y - colBox.sizeY/2, colBox.z);
-    box(colBox.sizeX, 1, colBox.sizeZ);
-    pop();
-    // Sides of boxes on the XY plane
-    push();
-    fill("purple");
-    translate(colBox.x, colBox.y, colBox.z);
-    box(colBox.sizeX-1, colBox.sizeY, colBox.sizeZ+1);
-    pop();
-    // Sides of boxes on the ZY plane
-    push();
-    fill("orange");
-    translate(colBox.x, colBox.y, colBox.z);
-    box(colBox.sizeX+1, colBox.sizeY, colBox.sizeZ-1);
-    pop();
+    if (showHitboxes) {
+      // Player feet
+      push();
+      fill("red");
+      translate(this.x, this.y + this.sizeY, this.z);
+      box(10, 10, 10);
+      pop();
+      // Player head
+      push();
+      fill("yellow");
+      translate(this.x, this.y - this.sizeY, this.z);
+      box(10, 10, 10);
+      pop();
+      // Bottom of boxes
+      push();
+      fill("blue");
+      translate(colBox.x, colBox.y + colBox.sizeY/2, colBox.z);
+      box(colBox.sizeX, 1, colBox.sizeZ);
+      pop();
+      // Top of boxes
+      push();
+      fill("green");
+      translate(colBox.x, colBox.y - colBox.sizeY/2, colBox.z);
+      box(colBox.sizeX, 1, colBox.sizeZ);
+      pop();
+      // Sides of boxes on the XY plane
+      push();
+      fill("purple");
+      translate(colBox.x, colBox.y, colBox.z);
+      box(colBox.sizeX-1, colBox.sizeY, colBox.sizeZ+1);
+      pop();
+      // Sides of boxes on the ZY plane
+      push();
+      fill("orange");
+      translate(colBox.x, colBox.y, colBox.z);
+      box(colBox.sizeX+1, colBox.sizeY, colBox.sizeZ-1);
+      pop();
+    }
   }
 }
 
