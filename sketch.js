@@ -14,6 +14,9 @@ let myFriend, cam, font, angle, pg;
 let player_spawn_cords = [0,0,0];
 let showHitboxes = false;
 
+// - reused wait function from my Grid Game - [aurora [starzz]]
+const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
 function keyPressed() {
   if (key === "q") {
     saveJSON(stage);
@@ -54,6 +57,10 @@ function onLevelLoad() {
     // Creates a rectangular prism based on the position and dimensions in the json
     if (badword[piece][0] === "box") {
       let boxexclaimationmark = new Box(badword[piece][1],badword[piece][2],badword[piece][3],badword[piece][4],badword[piece][5],badword[piece][6]);
+      myWonderfulBoxes.push(boxexclaimationmark);
+    }
+    if (badword[piece][0] === "movingplat_vertical") {
+      let boxexclaimationmark = new VertMoving(badword[piece][1],badword[piece][2],badword[piece][3],badword[piece][4],badword[piece][5],badword[piece][6]);
       myWonderfulBoxes.push(boxexclaimationmark);
     }
     else if (badword[piece][0] === "player_spawn") {
@@ -167,13 +174,17 @@ class Player {
   // Detects collision between the player and any boxes to stop the player from running through walls
   checkCollision(colBox) {
     if (this.y + this.sizeY < colBox.y - colBox.sizeY/2 &&  // checks if above the platform
-      this.y + this.sizeY > colBox.y - 15 && // checks if right above the platform or if just above it in general
+      this.y + this.sizeY > colBox.y - 5 && // checks if right above the platform or if just above it in general
       (this.x + this.sizeX/2 > colBox.x - colBox.sizeX/2 && 
       this.x - this.sizeX/2 < colBox.x + colBox.sizeX/2) &&
       (this.z + this.sizeZ/2 > colBox.z - colBox.sizeZ/2 &&
       this.z - this.sizeZ/2 < colBox.z + colBox.sizeZ/2)) {
-      this.isOnFloor = true;
       this.y = colBox.y - colBox.sizeY - this.sizeY;
+      this.isOnFloor = true;
+    }
+    else if (this.y + this.sizeY < colBox.y + colBox.sizeY/2) {
+      this.y = colBox.y - colBox.sizeY - this.sizeY;
+      this.isOnFloor = true;
     }
     if (this.y + this.sizeY > colBox.y - colBox.sizeY/2 && // checks if below the platform's base
       (this.x + this.sizeX/2 > colBox.x - colBox.sizeX/2 && 
@@ -246,6 +257,49 @@ class Box {
     push();
     translate(this.x, this.y, this.z);
     box(this.sizeX, this.sizeY, this.sizeZ);
+    pop();
+  }
+}
+
+class VertMoving {
+  constructor(x, y, z, sizeX, sizeY, sizeZ) {
+    this.x = x;
+    this.yLevels = {minY: y[0], maxY: y[1]};
+    this.y = this.yLevels.minY;
+    this.z = z;
+    this.sizeX = sizeX;
+    this.sizeY = sizeY;
+    this.sizeZ = sizeZ;
+    this.animate();
+  }
+
+  // Shows the box when called
+  display() {
+    push();
+    translate(this.x, this.y, this.z);
+    box(this.sizeX, this.sizeY, this.sizeZ);
+    pop();
+  }
+
+  async animate() {
+    await wait(250);
+    push();
+    p5.tween.manager
+      .addTween(this, 'tween1')
+      .addMotions([{ key: 'y', target: this.yLevels.maxY}], 70 * abs(this.yLevels.maxY - this.yLevels.minY), 'linear')
+      .startTween()
+      .onEnd(() => this.animatePartTwo());
+    pop();
+  }
+  
+  async animatePartTwo() {
+    await wait(250);
+    push();
+    p5.tween.manager
+      .addTween(this, 'tween2')
+      .addMotions([{ key: 'y', target: this.yLevels.minY}], 70 * abs(this.yLevels.maxY - this.yLevels.minY), 'linear')
+      .startTween()
+      .onEnd(() => this.animate());
     pop();
   }
 }
