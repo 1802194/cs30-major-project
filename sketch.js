@@ -10,6 +10,7 @@ let stage = {};
 let level = 1;
 let myWonderfulBoxes = [];
 let allStars = [];
+let allPortals = [];
 let myFriend, cam, font, angle, pg;
 let player_spawn_cords = [0,0,0];
 let showHitboxes = false;
@@ -75,6 +76,11 @@ function onLevelLoad() {
       let newStar = new Star(badword[piece][1],badword[piece][2],badword[piece][3],badword[piece][4]);
       allStars.push(newStar);
     }
+    else if (badword[piece][0] === "portal") {
+      // Creates a star at the specified position to be collected by the player
+      let newPortal = new Portal(badword[piece][1],badword[piece][2],badword[piece][3],badword[piece][4],badword[piece][5],badword[piece][6]);
+      allPortals.push(newPortal);
+    }
   }
   myFriend = undefined;
   // Spawns in the player to the scene
@@ -96,6 +102,11 @@ function draw() {
     for (let box = 0; box < myWonderfulBoxes.length; box++) {
       myWonderfulBoxes[box].display();
       myFriend.checkCollision(myWonderfulBoxes[box]);
+    }
+
+    for (let i = 0; i < allPortals.length; i++) {
+      allPortals[i].display();
+      myFriend.checkPortal(allPortals[i]);
     }
 
     // Shows the stars
@@ -212,8 +223,7 @@ class Player {
         this.x = this.lastPosition.x;
       }
     }
-
-
+    
     // HITBOX COLLISION SPOTS
     if (showHitboxes) {
       // Bottom of boxes
@@ -241,6 +251,25 @@ class Player {
       box(colBox.sizeX+1, colBox.sizeY, colBox.sizeZ-1);
       pop();
     }
+  }
+
+  checkPortal(colPortal) {
+    let topofMeBuddy = colPortal.y - colPortal.height - 150;
+    if (this.y + this.sizeY < colPortal.y + 10 &&  // checks if above the platform
+      this.y + this.sizeY > topofMeBuddy && // checks if ontop of the portal and not just above in general
+      (this.x + this.sizeX/2 > colPortal.x - colPortal.radius/2 && 
+      this.x - this.sizeX/2 < colPortal.x + colPortal.radius/2) &&
+      (this.z + this.sizeZ/2 > colPortal.z - colPortal.radius/2 &&
+      this.z - this.sizeZ/2 < colPortal.z + colPortal.radius/2)) {
+      this.x = colPortal.x2;
+      this.y = colPortal.y2;
+      this.z = colPortal.z2;
+    }
+    push();
+    fill("teal");
+    translate(colPortal.x, topofMeBuddy, colPortal.z);
+    box(10, 10, 10);
+    pop();
   }
 }
 
@@ -315,6 +344,26 @@ class Star {
     push();
     translate(this.x, this.y, this.z);
     sphere(this.radius);
+    pop();
+  }
+}
+
+class Portal {
+  constructor(x1, y1, z1, x2, y2, z2) {
+    this.x = x1;
+    this.x2 = x2;
+    this.y = y1;
+    this.y2 = y2;
+    this.z = z1;
+    this.z2 = z2;
+    this.radius = 50;
+    this.height = 5;
+  }
+
+  display() {
+    push();
+    translate(this.x, this.y, this.z);
+    cylinder(this.radius, this.height);
     pop();
   }
 }
