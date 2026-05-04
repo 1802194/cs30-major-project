@@ -3,10 +3,10 @@ Captain Toad
 
 ## Needs to Have
 - 2-3 levels
-- 3D maps
+- 3D maps ✔
 - Sound effects
 - Actual end goal item
-- Doors/teleport
+- Doors/teleport ✔
 - Enemies/Obsticles
 - Menu
 
