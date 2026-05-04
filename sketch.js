@@ -134,6 +134,21 @@ class Player {
     translate(this.x, this.y, this.z);
     ellipsoid(this.sizeX, this.sizeY, this.sizeZ);
     pop();
+
+    if (showHitboxes) {
+      // Player feet
+      push();
+      fill("red");
+      translate(this.x, this.y + this.sizeY, this.z);
+      box(10, 10, 10);
+      pop();
+      // Player head
+      push();
+      fill("yellow");
+      translate(this.x, this.y - this.sizeY, this.z);
+      box(10, 10, 10);
+      pop();
+    }
   }
 
   update() {
@@ -174,17 +189,16 @@ class Player {
   // Detects collision between the player and any boxes to stop the player from running through walls
   checkCollision(colBox) {
     if (this.y + this.sizeY < colBox.y - colBox.sizeY/2 &&  // checks if above the platform
-      this.y + this.sizeY > colBox.y - 5 && // checks if right above the platform or if just above it in general
+      this.y + this.sizeY > colBox.y - 15 && // checks if right above the platform or if just above it in general
       (this.x + this.sizeX/2 > colBox.x - colBox.sizeX/2 && 
       this.x - this.sizeX/2 < colBox.x + colBox.sizeX/2) &&
       (this.z + this.sizeZ/2 > colBox.z - colBox.sizeZ/2 &&
       this.z - this.sizeZ/2 < colBox.z + colBox.sizeZ/2)) {
       this.y = colBox.y - colBox.sizeY - this.sizeY;
       this.isOnFloor = true;
-    }
-    else if (this.y + this.sizeY < colBox.y + colBox.sizeY/2) {
-      this.y = colBox.y - colBox.sizeY - this.sizeY;
-      this.isOnFloor = true;
+      if (colBox instanceof VertMoving) {
+        this.y = colBox.y - colBox.sizeY - this.sizeY - 0.25;
+      }
     }
     if (this.y + this.sizeY > colBox.y - colBox.sizeY/2 && // checks if below the platform's base
       (this.x + this.sizeX/2 > colBox.x - colBox.sizeX/2 && 
@@ -202,18 +216,6 @@ class Player {
 
     // HITBOX COLLISION SPOTS
     if (showHitboxes) {
-      // Player feet
-      push();
-      fill("red");
-      translate(this.x, this.y + this.sizeY, this.z);
-      box(10, 10, 10);
-      pop();
-      // Player head
-      push();
-      fill("yellow");
-      translate(this.x, this.y - this.sizeY, this.z);
-      box(10, 10, 10);
-      pop();
       // Bottom of boxes
       push();
       fill("blue");
@@ -283,24 +285,20 @@ class VertMoving {
 
   async animate() {
     await wait(250);
-    push();
     p5.tween.manager
       .addTween(this, 'tween1')
       .addMotions([{ key: 'y', target: this.yLevels.maxY}], 70 * abs(this.yLevels.maxY - this.yLevels.minY), 'linear')
       .startTween()
       .onEnd(() => this.animatePartTwo());
-    pop();
   }
   
   async animatePartTwo() {
     await wait(250);
-    push();
     p5.tween.manager
       .addTween(this, 'tween2')
       .addMotions([{ key: 'y', target: this.yLevels.minY}], 70 * abs(this.yLevels.maxY - this.yLevels.minY), 'linear')
       .startTween()
       .onEnd(() => this.animate());
-    pop();
   }
 }
 
