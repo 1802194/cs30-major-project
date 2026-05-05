@@ -16,6 +16,7 @@ let player_spawn_cords = [0,0,0];
 let showHitboxes = false;
 let starCount = 0;
 let collectedStars = 0;
+let intro_playing = false;
 
 // - reused wait function from my Grid Game - [aurora [starzz]]
 const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms));
@@ -95,7 +96,9 @@ function onLevelLoad() {
 function draw() {
   background(220);
   // Allows camera control
-  orbitControl();
+  if (!intro_playing) {
+    orbitControl();
+  }
 
   // Controls the player
   if (myFriend !== undefined) {
@@ -182,24 +185,26 @@ class Player {
 
     // Keyboard controls for player movement
     // W
-    if (keyIsDown(87)) {
-      this.x += sin(angle)*this.speed;
-      this.z += cos(angle)*this.speed;
-    }
-    // S
-    if (keyIsDown(83)) {
-      this.x -= sin(angle)*this.speed;
-      this.z -= cos(angle)*this.speed;
-    }
-    // A
-    if (keyIsDown(68)) {
-      this.x -= cos(angle)*this.speed;
-      this.z += sin(angle)*this.speed;
-    }
-    // D
-    if (keyIsDown(65)) {
-      this.x += cos(angle)*this.speed;
-      this.z -= sin(angle)*this.speed;
+    if (!intro_playing) {
+      if (keyIsDown(87)) {
+        this.x += sin(angle)*this.speed;
+        this.z += cos(angle)*this.speed;
+      }
+      // S
+      if (keyIsDown(83)) {
+        this.x -= sin(angle)*this.speed;
+        this.z -= cos(angle)*this.speed;
+      }
+      // A
+      if (keyIsDown(68)) {
+        this.x -= cos(angle)*this.speed;
+        this.z += sin(angle)*this.speed;
+      }
+      // D
+      if (keyIsDown(65)) {
+        this.x += cos(angle)*this.speed;
+        this.z -= sin(angle)*this.speed;
+      }
     }
   }
 
@@ -296,6 +301,14 @@ class Player {
         }
       }
     }
+  }
+}
+
+class Elevator {
+  constructor(x, y, z) {
+    this.x = x;
+    this.y = y;
+    this.z = z;
   }
 }
 
