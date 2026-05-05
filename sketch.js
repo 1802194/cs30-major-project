@@ -312,7 +312,7 @@ class Box {
   // Shows the box when called
   display() {
     push();
-    translate(this.x, this.y+14, this.z);
+    translate(this.x, this.y, this.z);
     box(this.sizeX, this.sizeY, this.sizeZ);
     pop();
   }
