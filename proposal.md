@@ -5,7 +5,7 @@ Captain Toad
 - 2-3 levels
 - 3D maps ✔
 - Sound effects
-- Actual end goal item
+- Actual end goal item ✔
 - Doors/teleport ✔
 - Enemies/Obsticles
 - Menu

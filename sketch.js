@@ -160,13 +160,13 @@ class Player {
       push();
       fill("red");
       translate(this.x, this.y + this.sizeY, this.z);
-      box(10, 10, 10);
+      box(10, 1, 10);
       pop();
       // Player head
       push();
       fill("yellow");
       translate(this.x, this.y - this.sizeY, this.z);
-      box(10, 10, 10);
+      box(10, 1, 10);
       pop();
     }
   }
