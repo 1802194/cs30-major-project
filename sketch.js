@@ -14,6 +14,8 @@ let allPortals = [];
 let myFriend, cam, font, angle, pg;
 let player_spawn_cords = [0,0,0];
 let showHitboxes = false;
+let starCount = 0;
+let collectedStars = 0;
 
 // - reused wait function from my Grid Game - [aurora [starzz]]
 const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms));
@@ -49,6 +51,8 @@ async function createLevel() {
 }
 
 function onLevelLoad() {
+  starCount = 0;
+  collectedStars = 0;
   // This array stores all of the objects present on he field
   myWonderfulBoxes = [];
 
@@ -73,6 +77,7 @@ function onLevelLoad() {
     }
     else if (badword[piece][0] === "star") {
       // Creates a star at the specified position to be collected by the player
+      starCount += 1;
       let newStar = new Star(badword[piece][1],badword[piece][2],badword[piece][3],badword[piece][4]);
       allStars.push(newStar);
     }
@@ -112,6 +117,7 @@ function draw() {
     // Shows the stars
     for (let stars = 0; stars < allStars.length; stars++) {
       allStars[stars].display();
+      myFriend.checkStar(allStars[stars]);
     }
 
     let cam_x = cam.centerX - cam.eyeX;
@@ -200,7 +206,7 @@ class Player {
   // Detects collision between the player and any boxes to stop the player from running through walls
   checkCollision(colBox) {
     if (this.y + this.sizeY < colBox.y - colBox.sizeY/2 &&  // checks if above the platform
-      this.y + this.sizeY > colBox.y - 15 && // checks if right above the platform or if just above it in general
+      this.y + this.sizeY > colBox.y - 20 && // checks if right above the platform or if just above it in general
       (this.x + this.sizeX/2 > colBox.x - colBox.sizeX/2 && 
       this.x - this.sizeX/2 < colBox.x + colBox.sizeX/2) &&
       (this.z + this.sizeZ/2 > colBox.z - colBox.sizeZ/2 &&
@@ -208,14 +214,15 @@ class Player {
       this.y = colBox.y - colBox.sizeY - this.sizeY;
       this.isOnFloor = true;
       if (colBox instanceof VertMoving) {
-        this.y = colBox.y - colBox.sizeY - this.sizeY - 0.25;
+        this.y = colBox.y - colBox.sizeY - this.sizeY - 14;
       }
     }
     if (this.y + this.sizeY > colBox.y - colBox.sizeY/2 && // checks if below the platform's base
       (this.x + this.sizeX/2 > colBox.x - colBox.sizeX/2 && 
       this.x - this.sizeX/2 < colBox.x + colBox.sizeX/2) &&
       (this.z + this.sizeZ/2 > colBox.z - colBox.sizeZ/2 &&
-      this.z - this.sizeZ/2 < colBox.z + colBox.sizeZ/2)) {
+      this.z - this.sizeZ/2 < colBox.z + colBox.sizeZ/2) &&
+      this.y - this.sizeY < colBox.y + colBox.sizeY/2) {
       if (this.z > colBox.z + colBox.sizeZ / 2 || this.z < colBox.z - colBox.sizeZ / 2) {
         this.z = this.lastPosition.z;
       } 
@@ -265,11 +272,30 @@ class Player {
       this.y = colPortal.y2;
       this.z = colPortal.z2;
     }
-    push();
-    fill("teal");
-    translate(colPortal.x, topofMeBuddy, colPortal.z);
-    box(10, 10, 10);
-    pop();
+    if (showHitboxes) {
+      push();
+      fill("teal");
+      translate(colPortal.x, topofMeBuddy, colPortal.z);
+      box(10, 10, 10);
+      pop();
+    }
+  }
+
+  checkStar(colStar) {
+    if (this.y + this.sizeY > colStar.y + colStar.radius &&
+      this.y - this.sizeY < colStar.y - colStar.radius &&
+      (this.x + this.sizeX/2 > colStar.x - colStar.radius/2 && 
+      this.x - this.sizeX/2 < colStar.x + colStar.radius/2) &&
+      (this.z + this.sizeZ/2 > colStar.z - colStar.radius/2 &&
+      this.z - this.sizeZ/2 < colStar.z + colStar.radius/2)) {
+      if (!colStar.collected) {
+        colStar.collected = true;
+        collectedStars += 1;
+        if (collectedStars === starCount) {
+          createLevel(); 
+        }
+      }
+    }
   }
 }
 
@@ -286,7 +312,7 @@ class Box {
   // Shows the box when called
   display() {
     push();
-    translate(this.x, this.y, this.z);
+    translate(this.x, this.y+14, this.z);
     box(this.sizeX, this.sizeY, this.sizeZ);
     pop();
   }
@@ -316,7 +342,7 @@ class VertMoving {
     await wait(250);
     p5.tween.manager
       .addTween(this, 'tween1')
-      .addMotions([{ key: 'y', target: this.yLevels.maxY}], 70 * abs(this.yLevels.maxY - this.yLevels.minY), 'linear')
+      .addMotions([{ key: 'y', target: this.yLevels.maxY}], 25 * abs(this.yLevels.maxY - this.yLevels.minY), 'linear')
       .startTween()
       .onEnd(() => this.animatePartTwo());
   }
@@ -325,7 +351,7 @@ class VertMoving {
     await wait(250);
     p5.tween.manager
       .addTween(this, 'tween2')
-      .addMotions([{ key: 'y', target: this.yLevels.minY}], 70 * abs(this.yLevels.maxY - this.yLevels.minY), 'linear')
+      .addMotions([{ key: 'y', target: this.yLevels.minY}], 25 * abs(this.yLevels.maxY - this.yLevels.minY), 'linear')
       .startTween()
       .onEnd(() => this.animate());
   }
@@ -337,14 +363,18 @@ class Star {
     this.y = y;
     this.z = z;
     this.radius = 25;
+    this.collected = false;
   }
 
   // Shows the star when called
   display() {
-    push();
-    translate(this.x, this.y, this.z);
-    sphere(this.radius);
-    pop();
+    if (!this.collected) {
+      push();
+      translate(this.x, this.y, this.z);
+      fill("yellow");
+      sphere(this.radius);
+      pop();
+    }
   }
 }
 
