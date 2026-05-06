@@ -184,26 +184,34 @@ class Player {
     this.lastPosition = {x: this.x, y: this.y, z: this.z};
 
     // Keyboard controls for player movement
-    // W
+    let sprintSpeed;
     if (!intro_playing) {
+      // Speed up with left shift
+      if (keyIsDown(16)) {
+        sprintSpeed = this.speed * 2;
+      }
+      else {
+        sprintSpeed = this.speed;
+      }
+      // W
       if (keyIsDown(87)) {
-        this.x += sin(angle)*this.speed;
-        this.z += cos(angle)*this.speed;
+        this.x += sin(angle)*sprintSpeed;
+        this.z += cos(angle)*sprintSpeed;
       }
       // S
       if (keyIsDown(83)) {
-        this.x -= sin(angle)*this.speed;
-        this.z -= cos(angle)*this.speed;
+        this.x -= sin(angle)*sprintSpeed;
+        this.z -= cos(angle)*sprintSpeed;
       }
       // A
       if (keyIsDown(68)) {
-        this.x -= cos(angle)*this.speed;
-        this.z += sin(angle)*this.speed;
+        this.x -= cos(angle)*sprintSpeed;
+        this.z += sin(angle)*sprintSpeed;
       }
       // D
       if (keyIsDown(65)) {
-        this.x += cos(angle)*this.speed;
-        this.z -= sin(angle)*this.speed;
+        this.x += cos(angle)*sprintSpeed;
+        this.z -= sin(angle)*sprintSpeed;
       }
     }
   }
