@@ -146,10 +146,17 @@ class Player {
     this.airtime = 0;
     this.isOnFloor = false;
     this.lastPosition = {x: this.x, y: this.y, z: this.z};
+    this.createElevator();
+    this.elevator;
+  }
+
+  createElevator() {
+    this.elevator = new Elevator(this.x, this.y/2, this.z);
   }
 
   // Shows the player when called
   display() {
+    this.elevator.display();
     push();
     translate(this.x, this.y, this.z);
     ellipsoid(this.sizeX, this.sizeY, this.sizeZ);
@@ -327,6 +334,27 @@ class Elevator {
     this.x = x;
     this.y = y;
     this.z = z;
+    this.leftdoorposer;
+    this.rightdoorposer;
+    this.pieces = [
+      {piece:new Box(this.x, this.y+50, this.z, 300, 10, 300), indexer:0},
+      {piece:new Box(this.x, this.y-150, this.z, 300, 10, 300), indexer:0},
+      {piece:new Box(this.x-150, this.y-50, this.z, 10, 200, 300), indexer:0},
+      {piece:new Box(this.x, this.y-50, this.z-150, 300, 200, 10), indexer:0},
+      {piece:new Box(this.x, this.y-50, this.z+150, 300, 200, 10), indexer:0}];
+    for (let piece in this.pieces) {
+      this.pieces[piece].indexer = myWonderfulBoxes.length;
+      myWonderfulBoxes.push(this.pieces[piece].piece);
+    }
+    cam.setPosition(this.x+1000, -80, 0);
+    cam.lookAt(this.x, this.y, this.z);
+  }
+
+  display() {
+    push();
+    //translate(this.x, this.y, this.z);
+    //box(100, 100, 100);
+    pop();
   }
 }
 
