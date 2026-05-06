@@ -219,15 +219,15 @@ class Player {
   // Detects collision between the player and any boxes to stop the player from running through walls
   checkCollision(colBox) {
     if (this.y + this.sizeY < colBox.y - colBox.sizeY/2 &&  // checks if above the platform
-      this.y + this.sizeY > colBox.y - 20 && // checks if right above the platform or if just above it in general
+      this.y + this.sizeY > colBox.y - colBox.sizeY/2 - 20 && // checks if right above the platform or if just above it in general
       (this.x + this.sizeX/2 > colBox.x - colBox.sizeX/2 && 
       this.x - this.sizeX/2 < colBox.x + colBox.sizeX/2) &&
       (this.z + this.sizeZ/2 > colBox.z - colBox.sizeZ/2 &&
       this.z - this.sizeZ/2 < colBox.z + colBox.sizeZ/2)) {
-      this.y = colBox.y - colBox.sizeY - this.sizeY;
+      this.y = colBox.y - (colBox.sizeY/2 + 5) - this.sizeY;
       this.isOnFloor = true;
       if (colBox instanceof VertMoving) {
-        this.y = colBox.y - colBox.sizeY - this.sizeY - 14;
+        this.y = colBox.y - (colBox.sizeY/2 + 5) - this.sizeY - 15;
       }
     }
     if (this.y + this.sizeY > colBox.y - colBox.sizeY/2 && // checks if below the platform's base
@@ -269,6 +269,16 @@ class Player {
       fill("orange");
       translate(colBox.x, colBox.y, colBox.z);
       box(colBox.sizeX+1, colBox.sizeY, colBox.sizeZ-1);
+      pop();
+      push();
+      fill("coral");
+      translate(colBox.x, colBox.y - colBox.sizeY/2 - 20, colBox.z);
+      box(colBox.sizeX, 1, colBox.sizeZ);
+      pop();
+      push();
+      fill("lavender");
+      translate(this.x, colBox.y - colBox.sizeY/2 - this.sizeY, this.z);
+      box(10, 10, 10);
       pop();
     }
   }
