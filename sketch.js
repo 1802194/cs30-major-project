@@ -333,10 +333,13 @@ class Elevator {
   constructor(x, y, z) {
     this.x = x;
     this.y = y;
+    this.bottomY = y+500;
+    this.origY = y;
     this.z = z;
     this.leftdoorposer;
     this.rightdoorposer;
     this.pieces = [
+      {piece:new Box(this.x, this.y-5150, this.z, 10, 10000, 10), indexer:0},
       {piece:new Box(this.x, this.y+50, this.z, 300, 10, 300), indexer:0},
       {piece:new Box(this.x, this.y-150, this.z, 300, 10, 300), indexer:0},
       {piece:new Box(this.x-150, this.y-50, this.z, 10, 200, 300), indexer:0},
@@ -346,11 +349,20 @@ class Elevator {
       this.pieces[piece].indexer = myWonderfulBoxes.length;
       myWonderfulBoxes.push(this.pieces[piece].piece);
     }
-    cam.setPosition(this.x+1000, -80, 0);
+    cam.setPosition(this.x+1000, -80, this.z);
     cam.lookAt(this.x, this.y, this.z);
+    p5.tween.manager
+      .addTween(this, 'tween1')
+      .addMotions([{ key: 'y', target: this.y}], 25 * abs(this.yLevels.maxY - this.yLevels.minY), 'linear')
+      .startTween()
+      .onEnd(() => this.animatePartTwo());
   }
 
   display() {
+    for (let piece in this.pieces) {
+      let offset = myWonderfulBoxes[this.pieces[piece].indexer].y - this.origY;
+      myWonderfulBoxes[this.pieces[piece].indexer].y = this.y+offset;
+    }
     push();
     //translate(this.x, this.y, this.z);
     //box(100, 100, 100);
