@@ -16,7 +16,7 @@ let player_spawn_cords = [0,0,0];
 let showHitboxes = false;
 let starCount = 0;
 let collectedStars = 0;
-let intro_playing = false;
+let intro_playing = true;
 
 // - reused wait function from my Grid Game - [aurora [starzz]]
 const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms));
@@ -52,6 +52,7 @@ async function createLevel() {
 }
 
 function onLevelLoad() {
+  intro_playing = true;
   starCount = 0;
   collectedStars = 0;
   // This array stores all of the objects present on he field
@@ -142,7 +143,7 @@ class Player {
     this.sizeZ = sizeZ;
     this.speed = 3;
     this.fallingspeed = 8;
-    this.airacceleration = 0.75;
+    this.airacceleration = 0.5;
     this.airtime = 0;
     this.isOnFloor = false;
     this.lastPosition = {x: this.x, y: this.y, z: this.z};
@@ -152,13 +153,21 @@ class Player {
 
   createElevator() {
     this.elevator = new Elevator(this.x, this.y/2, this.z);
+    this.y += 500;
   }
 
   // Shows the player when called
   display() {
     this.elevator.display();
     push();
-    translate(this.x, this.y, this.z);
+    if (this.elevator.moving === false) {
+      translate(this.x, this.y, this.z);
+    }
+    else {
+      translate(this.x, this.elevator.y-30, this.z);
+      this.y = this.elevator.y-51
+      this.airtime = 0;
+    }
     ellipsoid(this.sizeX, this.sizeY, this.sizeZ);
     pop();
 
@@ -331,10 +340,10 @@ class Player {
 
 class Elevator {
   constructor(x, y, z) {
-    this.x = x;
-    this.y = y;
-    this.bottomY = y+500;
     this.origY = y;
+    this.lowestY = y+250;
+    this.x = x;
+    this.y = y+250;
     this.z = z;
     this.leftdoorposer;
     this.rightdoorposer;
@@ -349,18 +358,25 @@ class Elevator {
       this.pieces[piece].indexer = myWonderfulBoxes.length;
       myWonderfulBoxes.push(this.pieces[piece].piece);
     }
+    this.moving = true;
     cam.setPosition(this.x+1000, -80, this.z);
-    cam.lookAt(this.x, this.y, this.z);
+    cam.lookAt(this.x, this.origY, this.z);
     p5.tween.manager
       .addTween(this, 'tween1')
-      .addMotions([{ key: 'y', target: this.y}], 25 * abs(this.yLevels.maxY - this.yLevels.minY), 'linear')
+      .addMotions([{ key: 'y', target: this.origY}], 1000, 'easeOutQuart')
       .startTween()
-      .onEnd(() => this.animatePartTwo());
+      .onEnd(() => this.killer());
+  }
+
+  killer() {
+    this.moving = false;
+    intro_playing = false;
   }
 
   display() {
     for (let piece in this.pieces) {
-      let offset = myWonderfulBoxes[this.pieces[piece].indexer].y - this.origY;
+      let offset = myWonderfulBoxes[this.pieces[piece].indexer].origY - this.lowestY;
+      console.log(offset);
       myWonderfulBoxes[this.pieces[piece].indexer].y = this.y+offset;
     }
     push();
@@ -378,6 +394,7 @@ class Box {
     this.sizeX = sizeX;
     this.sizeY = sizeY;
     this.sizeZ = sizeZ;
+    this.origY = y;
   }
 
   // Shows the box when called
