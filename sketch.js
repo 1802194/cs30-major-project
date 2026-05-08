@@ -165,7 +165,7 @@ class Player {
     }
     else {
       translate(this.x, this.elevator.y-30, this.z);
-      this.y = this.elevator.y-51
+      this.y = this.elevator.y-51;
       this.airtime = 0;
     }
     ellipsoid(this.sizeX, this.sizeY, this.sizeZ);
