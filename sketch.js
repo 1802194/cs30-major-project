@@ -39,6 +39,8 @@ function keyPressed() {
 
 function preload() {
   font = loadFont("SeagirlDreams.otf");
+  starSound = loadSound("shine-10.mp3");
+  portalSound = loadSound("teleport.mp3");
 }
 
 function setup() {
@@ -286,11 +288,11 @@ class Player {
       translate(colBox.x, colBox.y, colBox.z);
       box(colBox.sizeX+1, colBox.sizeY, colBox.sizeZ-1);
       pop();
-      push();
-      fill("coral");
-      translate(colBox.x, colBox.y - colBox.sizeY/2 - 20, colBox.z);
-      box(colBox.sizeX, 1, colBox.sizeZ);
-      pop();
+      // push();
+      // fill("coral");
+      // translate(colBox.x, colBox.y - colBox.sizeY/2 - 20, colBox.z);
+      // box(colBox.sizeX, 1, colBox.sizeZ);
+      // pop();
       push();
       fill("lavender");
       translate(this.x, colBox.y - colBox.sizeY/2 - this.sizeY, this.z);
@@ -307,6 +309,7 @@ class Player {
       this.x - this.sizeX/2 < colPortal.x + colPortal.radius/2) &&
       (this.z + this.sizeZ/2 > colPortal.z - colPortal.radius/2 &&
       this.z - this.sizeZ/2 < colPortal.z + colPortal.radius/2)) {
+      portalSound.play();
       this.x = colPortal.x2;
       this.y = colPortal.y2;
       this.z = colPortal.z2;
@@ -331,6 +334,7 @@ class Player {
       (this.z + this.sizeZ/2 > colStar.z - colStar.radius/2 &&
       this.z - this.sizeZ/2 < colStar.z + colStar.radius/2)) {
       if (!colStar.collected) {
+        starSound.play();
         colStar.collected = true;
         collectedStars ++;
         if (collectedStars === starCount) {
