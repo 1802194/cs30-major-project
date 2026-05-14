@@ -310,6 +310,9 @@ class Player {
       this.x = colPortal.x2;
       this.y = colPortal.y2;
       this.z = colPortal.z2;
+      this.fallingspeed = 0;
+      this.airtime = 0;
+      //this.airacceleration = 0;
     }
     if (showHitboxes) {
       push();
@@ -329,7 +332,7 @@ class Player {
       this.z - this.sizeZ/2 < colStar.z + colStar.radius/2)) {
       if (!colStar.collected) {
         colStar.collected = true;
-        collectedStars += 1;
+        collectedStars ++;
         if (collectedStars === starCount) {
           createLevel(); 
         }
