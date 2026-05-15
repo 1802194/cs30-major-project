@@ -17,6 +17,7 @@ let showHitboxes = false;
 let starCount = 0;
 let collectedStars = 0;
 let intro_playing = true;
+let mainMenu = false;
 
 // - reused wait function from my Grid Game - [aurora [starzz]]
 const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms));
@@ -34,6 +35,10 @@ function keyPressed() {
   }
   if (key === "b") {
     showHitboxes = !showHitboxes;
+  }
+  if (key === "p") {
+    mainMenu = !mainMenu;
+    createLevel();
   }
 }
 
@@ -97,40 +102,49 @@ function onLevelLoad() {
 }
 
 function draw() {
-  background(220);
-  // Allows camera control
-  if (!intro_playing) {
-    orbitControl();
+  if (mainMenu) {
+    background(220);
+    textSize(50);
+    textFont(font);
+    textAlign(CENTER);
+    text('Press p to start the level', width / 2, height / 2);
   }
-
-  // Controls the player
-  if (myFriend !== undefined) {
-    myFriend.display();
-    myFriend.update();
-    myFriend.isOnFloor = false;
-
-    // Shows the boxes and checks if the player is colliding with them
-    for (let box = 0; box < myWonderfulBoxes.length; box++) {
-      myWonderfulBoxes[box].display();
-      myFriend.checkCollision(myWonderfulBoxes[box]);
+  else {
+    background(220);
+    // Allows camera control
+    if (!intro_playing) {
+      orbitControl();
     }
 
-    for (let i = 0; i < allPortals.length; i++) {
-      allPortals[i].display();
-      myFriend.checkPortal(allPortals[i]);
-    }
+    // Controls the player
+    if (myFriend !== undefined) {
+      myFriend.display();
+      myFriend.update();
+      myFriend.isOnFloor = false;
 
-    // Shows the stars
-    for (let stars = 0; stars < allStars.length; stars++) {
-      allStars[stars].display();
-      myFriend.checkStar(allStars[stars]);
-    }
+      // Shows the boxes and checks if the player is colliding with them
+      for (let box = 0; box < myWonderfulBoxes.length; box++) {
+        myWonderfulBoxes[box].display();
+        myFriend.checkCollision(myWonderfulBoxes[box]);
+      }
 
-    let cam_x = cam.centerX - cam.eyeX;
-    let cam_z = cam.centerZ - cam.eyeZ;
-    let yaw = atan2(cam_x, cam_z);
-    angle = yaw;
+      for (let i = 0; i < allPortals.length; i++) {
+        allPortals[i].display();
+        myFriend.checkPortal(allPortals[i]);
+      }
+
+      // Shows the stars
+      for (let stars = 0; stars < allStars.length; stars++) {
+        allStars[stars].display();
+        myFriend.checkStar(allStars[stars]);
+      }
+
+      let cam_x = cam.centerX - cam.eyeX;
+      let cam_z = cam.centerZ - cam.eyeZ;
+      let yaw = atan2(cam_x, cam_z);
+      angle = yaw;
     // *(360/PI) for degrees btw
+    }
   }
 }
 
