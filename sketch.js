@@ -103,11 +103,19 @@ function onLevelLoad() {
 
 function draw() {
   if (mainMenu) {
+    let pan = atan2(cam.eyeZ - cam.centerZ, cam.eyeX - cam.centerX);
+    let tilt = atan2(cam.eyeY - cam.centerY, dist(cam.centerX, cam.centerZ, cam.eyeX, cam.eyeZ));
     background(220);
-    textSize(50);
     textFont(font);
     textAlign(CENTER);
-    text('Press p to start the level', width / 2, height / 2);
+    textSize(50);
+    translate(cam.eyeX, cam.eyeY, cam.eyeZ);
+    rotateY(-pan);
+    rotateZ(tilt + PI);
+    translate(200, 0, 0);
+    rotateY(-PI/2);
+    rotateZ(PI);
+    text('Press p to start the level', 0, 0);
   }
   else {
     background(220);
