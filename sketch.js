@@ -5,6 +5,8 @@
 // Extra for Experts:
 // - describe what you did to take this project "above and beyond"
 
+// can we not add the ceilings? it just kinda. doesn't work with the camera, hard to manuvear.
+
 //https://threejs.org/docs/#AnimationMixer
 let stage = {};
 let level = 1;
@@ -18,6 +20,9 @@ let starCount = 0;
 let collectedStars = 0;
 let intro_playing = true;
 let mainMenu = false;
+let camStagnantionEye;
+let camStagnantionCenter;
+let textBuffer;
 
 // - reused wait function from my Grid Game - [aurora [starzz]]
 const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms));
@@ -38,7 +43,9 @@ function keyPressed() {
   }
   if (key === "p") {
     mainMenu = !mainMenu;
-    createLevel();
+    camStagnantionCenter = {x : cam.centerX, y : cam.centerY, z : cam.centerZ};
+    camStagnantionEye = {x : cam.eyeX, y : cam.eyeY, z : cam.eyeZ};
+    // note from starzz (aurora), we didnt need to recreate the level everytime we were in the main menu, did something better instead! p.s, fixed the text bug c":
   }
 }
 
@@ -51,7 +58,10 @@ function preload() {
 function setup() {
   createCanvas(1280, 720, WEBGL);
   createLevel();
+  textFont(font);
   cam = _renderer._curCamera; 
+
+  textBuffer = createFramebuffer();
 }
 
 async function createLevel() {
@@ -80,6 +90,7 @@ function onLevelLoad() {
     else if (badword[piece][0] === "player_spawn") {
       // Determines the player's spawn point
       // could've done a for loop for this but.... ehhhhhhhhhhhh im lazy ill do it later (if i remember) - [starzz (aurora)]
+      // update: i tried, and the entire game broke. i will come back to this cuz it's definitely just me not having coded in awhile. i miss you, coding.
       player_spawn_cords[0] = badword[piece][1];
       player_spawn_cords[1] = badword[piece][2];
       player_spawn_cords[2] = badword[piece][3];
@@ -101,58 +112,87 @@ function onLevelLoad() {
   myFriend = new Player(player_spawn_cords[0],player_spawn_cords[1],player_spawn_cords[2],40,70,40);
 }
 
+function keepStagnantCamera() {
+  // this made me want to die writing it, but i genuinely do not know what else to do.
+  // - starzz
+  cam.centerX = camStagnantionCenter.x;
+  cam.centerY = camStagnantionCenter.y;
+  cam.centerZ = camStagnantionCenter.z;
+  cam.eyeX = camStagnantionEye.x;
+  cam.eyeY = camStagnantionEye.y;
+  cam.eyeZ = camStagnantionEye.z;
+}
+
 function draw() {
+  background(220);
   if (mainMenu) {
-    let pan = atan2(cam.eyeZ - cam.centerZ, cam.eyeX - cam.centerX);
-    let tilt = atan2(cam.eyeY - cam.centerY, dist(cam.centerX, cam.centerZ, cam.eyeX, cam.eyeZ));
-    background(220);
-    textFont(font);
-    textAlign(CENTER);
-    textSize(50);
+    // trying to get that text to show up, but no matter what I do, it wont. and the background of the frame buffer won't become translucent for the life of me.
+    // i'll fix what I can tomorrow. it's 1am.
+    // - starzz
+    textBuffer.begin();
+    background(0);
+    textAlign(CENTER, CENTER);
+    fill(255);
+    textSize(10);
+    text('Press [P] To Resume.', 0, 0, 0, 0);
+    textBuffer.end();
+
+    push();
+    // pan and tilt are built in names for p5, had to change them
+    // - starzz
+    let panner = atan2(cam.eyeZ - cam.centerZ, cam.eyeX - cam.centerX);
+    let tilter = atan2(cam.eyeY - cam.centerY, dist(cam.centerX, cam.centerZ, cam.eyeX, cam.eyeZ));
     translate(cam.eyeX, cam.eyeY, cam.eyeZ);
-    rotateY(-pan);
-    rotateZ(tilt + PI);
+    rotateY(-panner);
+    rotateZ(tilter + PI);
+    // if im being so honest. i have no idea why the translate x 200 actually makes this work. theres no. apparent reason for it. it's just the solution
+    // gonna research into this
+    // - starzz
     translate(200, 0, 0);
     rotateY(-PI/2);
     rotateZ(PI);
-    text('Press p to start the level', 0, 0);
+    tint(255, 127);
+    image(textBuffer, -width/2, -height/2);
+    pop();
   }
-  else {
-    background(220);
-    // Allows camera control
-    if (!intro_playing) {
-      orbitControl();
+  // Allows camera control
+  if (!intro_playing) {
+    if (mainMenu) {
+      keepStagnantCamera();
     }
+    orbitControl();
+  }
 
-    // Controls the player
-    if (myFriend !== undefined) {
-      myFriend.display();
+  // Controls the player
+  if (myFriend !== undefined) {
+    myFriend.display();
+    if (!mainMenu) {
       myFriend.update();
-      myFriend.isOnFloor = false;
-
-      // Shows the boxes and checks if the player is colliding with them
-      for (let box = 0; box < myWonderfulBoxes.length; box++) {
-        myWonderfulBoxes[box].display();
-        myFriend.checkCollision(myWonderfulBoxes[box]);
-      }
-
-      for (let i = 0; i < allPortals.length; i++) {
-        allPortals[i].display();
-        myFriend.checkPortal(allPortals[i]);
-      }
-
-      // Shows the stars
-      for (let stars = 0; stars < allStars.length; stars++) {
-        allStars[stars].display();
-        myFriend.checkStar(allStars[stars]);
-      }
-
-      let cam_x = cam.centerX - cam.eyeX;
-      let cam_z = cam.centerZ - cam.eyeZ;
-      let yaw = atan2(cam_x, cam_z);
-      angle = yaw;
-    // *(360/PI) for degrees btw
     }
+    myFriend.isOnFloor = false;
+
+    // Shows the boxes and checks if the player is colliding with them
+    for (let box = 0; box < myWonderfulBoxes.length; box++) {
+      myWonderfulBoxes[box].display();
+      myFriend.checkCollision(myWonderfulBoxes[box]);
+    }
+
+    for (let i = 0; i < allPortals.length; i++) {
+      allPortals[i].display();
+      myFriend.checkPortal(allPortals[i]);
+    }
+
+    // Shows the stars
+    for (let stars = 0; stars < allStars.length; stars++) {
+      allStars[stars].display();
+      myFriend.checkStar(allStars[stars]);
+    }
+
+    let cam_x = cam.centerX - cam.eyeX;
+    let cam_z = cam.centerZ - cam.eyeZ;
+    let yaw = atan2(cam_x, cam_z);
+    angle = yaw;
+  // *(360/PI) for degrees btw
   }
 }
 
@@ -405,7 +445,6 @@ class Elevator {
   display() {
     for (let piece in this.pieces) {
       let offset = myWonderfulBoxes[this.pieces[piece].indexer].origY - this.lowestY;
-      console.log(offset);
       myWonderfulBoxes[this.pieces[piece].indexer].y = this.y+offset;
     }
     push();
