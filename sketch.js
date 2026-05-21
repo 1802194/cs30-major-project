@@ -6,6 +6,7 @@
 // - describe what you did to take this project "above and beyond"
 
 // can we not add the ceilings? it just kinda. doesn't work with the camera, hard to manuvear.
+// I can remove those
 
 //https://threejs.org/docs/#AnimationMixer
 let stage = {};
@@ -129,13 +130,18 @@ function draw() {
     // trying to get that text to show up, but no matter what I do, it wont. and the background of the frame buffer won't become translucent for the life of me.
     // i'll fix what I can tomorrow. it's 1am.
     // - starzz
-    textBuffer.begin();
-    background(0);
-    textAlign(CENTER, CENTER);
-    fill(255);
-    textSize(10);
-    text('Press [P] To Resume.', 0, 0, 0, 0);
-    textBuffer.end();
+    // This causes the text to show up but I can't get the font to work
+    // I also couldn't get it to go away when pressing p again
+    // - Tyler
+    let menuText = createDiv('Press [P] To Resume.');
+    menuText.position(windowWidth/2, windowHeight/2);
+    // textBuffer.begin();
+    // background(0);
+    // textAlign(CENTER, CENTER);
+    // fill(255);
+    // textSize(10);
+    // text('Press [P] To Resume.', 0, 0, 0, 0);
+    // textBuffer.end();
 
     push();
     // pan and tilt are built in names for p5, had to change them
