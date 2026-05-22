@@ -6,7 +6,6 @@
 // - describe what you did to take this project "above and beyond"
 
 // can we not add the ceilings? it just kinda. doesn't work with the camera, hard to manuvear.
-// I can remove those
 
 //https://threejs.org/docs/#AnimationMixer
 let stage = {};
@@ -47,6 +46,9 @@ function keyPressed() {
     camStagnantionCenter = {x : cam.centerX, y : cam.centerY, z : cam.centerZ};
     camStagnantionEye = {x : cam.eyeX, y : cam.eyeY, z : cam.eyeZ};
     // note from starzz (aurora), we didnt need to recreate the level everytime we were in the main menu, did something better instead! p.s, fixed the text bug c":
+   
+    // display: hidden & display: block are supposed to help with making the text disappear/reappear but I haven't figured out how to do that yet
+    // -Tyler
   }
 }
 
@@ -54,6 +56,7 @@ function preload() {
   font = loadFont("SeagirlDreams.otf");
   starSound = loadSound("shine-10.mp3");
   portalSound = loadSound("teleport.mp3");
+  elevatorSound = loadSound("elevator-ding.mp3");
 }
 
 function setup() {
@@ -446,6 +449,8 @@ class Elevator {
   killer() {
     this.moving = false;
     intro_playing = false;
+    elevatorSound.play();
+    // sound doesn't play when refreshing the page for some reason but does work when loading the level otherwise
   }
 
   display() {
