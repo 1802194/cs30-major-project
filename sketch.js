@@ -14,6 +14,7 @@ let myWonderfulBoxes = [];
 let myWonderfulPushBoxes = [];
 let allStars = [];
 let allPortals = [];
+let allJumpPads = [];
 let myFriend, cam, font, angle, pg;
 let player_spawn_cords = [0,0,0];
 let showHitboxes = false;
@@ -114,9 +115,14 @@ function onLevelLoad() {
       allStars.push(newStar);
     }
     else if (badword[piece][0] === "portal") {
-      // Creates a star at the specified position to be collected by the player
+      // Creates a portal
       let newPortal = new Portal(badword[piece][1],badword[piece][2],badword[piece][3],badword[piece][4],badword[piece][5],badword[piece][6]);
       allPortals.push(newPortal);
+    }
+    else if (badword[piece][0] === "jump") {
+      // Creates a jump pad
+      let newJumpPad = new JumpPad(badword[piece][1],badword[piece][2],badword[piece][3],badword[piece][4]);
+      allJumpPads.push(newJumpPad);
     }
   }
   myFriend = undefined;
@@ -202,6 +208,11 @@ function draw() {
     for (let i = 0; i < allPortals.length; i++) {
       allPortals[i].display();
       myFriend.checkPortal(allPortals[i]);
+    }
+
+    for (let i = 0; i < allJumpPads.length; i++) {
+      allJumpPads[i].display();
+      myFriend.checkJumpPad(allJumpPads[i]);
     }
 
     // Shows the stars
@@ -416,6 +427,23 @@ class Player {
     }
   }
 
+  checkJumpPad(colJumpPad) {
+    let topofMeBuddy = colJumpPad.y - colJumpPad.height;
+    if (this.y + this.sizeY < colJumpPad.y + 10 &&  // checks if above the platform
+      this.y + this.sizeY > topofMeBuddy && // checks if ontop of the portal and not just above in general
+      (this.x + this.sizeX/2 > colJumpPad.x - colJumpPad.radius/2 && 
+      this.x - this.sizeX/2 < colJumpPad.x + colJumpPad.radius/2) &&
+      (this.z + this.sizeZ/2 > colJumpPad.z - colJumpPad.radius/2 &&
+      this.z - this.sizeZ/2 < colJumpPad.z + colJumpPad.radius/2)) {
+      portalSound.play();
+      this.y -= 5;
+      this.isOnFloor = false;
+      this.fallingspeed = -colJumpPad.power;
+      this.airtime = 0;
+      //this.airacceleration = -colJumpPad.power;
+    }
+  }
+
   checkStar(colStar) {
     if (this.y + this.sizeY > colStar.y + colStar.radius &&
       this.y - this.sizeY < colStar.y - colStar.radius &&
@@ -603,6 +631,25 @@ class Portal {
   display() {
     push();
     translate(this.x, this.y, this.z);
+    cylinder(this.radius, this.height);
+    pop();
+  }
+}
+
+class JumpPad {
+  constructor(x, y, z, power) {
+    this.x = x;
+    this.y = y;
+    this.z = z;
+    this.power = power;
+    this.radius = 50;
+    this.height = 5;
+  }
+
+  display() {
+    push();
+    translate(this.x, this.y, this.z);
+    fill('teal');
     cylinder(this.radius, this.height);
     pop();
   }
