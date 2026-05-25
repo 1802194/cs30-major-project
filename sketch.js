@@ -11,6 +11,7 @@
 let stage = {};
 let level = 1;
 let myWonderfulBoxes = [];
+let myWonderfulPushBoxes = [];
 let allStars = [];
 let allPortals = [];
 let myFriend, cam, font, angle, pg;
@@ -78,6 +79,9 @@ function onLevelLoad() {
   collectedStars = 0;
   // This array stores all of the objects present on he field
   myWonderfulBoxes = [];
+  myWonderfulPushBoxes = [];
+  allStars = [];
+  allPortals = [];
 
   let badword = stage["pieces"];
   // Checks the json for the level to know what objects need to be added
@@ -87,9 +91,13 @@ function onLevelLoad() {
       let boxexclaimationmark = new Box(badword[piece][1],badword[piece][2],badword[piece][3],badword[piece][4],badword[piece][5],badword[piece][6]);
       myWonderfulBoxes.push(boxexclaimationmark);
     }
-    if (badword[piece][0] === "movingplat_vertical") {
+    else if (badword[piece][0] === "movingplat_vertical") {
       let boxexclaimationmark = new VertMoving(badword[piece][1],badword[piece][2],badword[piece][3],badword[piece][4],badword[piece][5],badword[piece][6]);
       myWonderfulBoxes.push(boxexclaimationmark);
+    }
+    else if (badword[piece][0] === "pushableBox") {
+      let boxexclaimationmark = new PushableBox(badword[piece][1],badword[piece][2],badword[piece][3],badword[piece][4],badword[piece][5],badword[piece][6]);
+      myWonderfulPushBoxes.push(boxexclaimationmark);
     }
     else if (badword[piece][0] === "player_spawn") {
       // Determines the player's spawn point
@@ -184,6 +192,11 @@ function draw() {
     for (let box = 0; box < myWonderfulBoxes.length; box++) {
       myWonderfulBoxes[box].display();
       myFriend.checkCollision(myWonderfulBoxes[box]);
+    }
+
+    for (let box = 0; box < myWonderfulPushBoxes.length; box++) {
+      myWonderfulPushBoxes[box].display();
+      myFriend.checkCollision(myWonderfulPushBoxes[box]);
     }
 
     for (let i = 0; i < allPortals.length; i++) {
@@ -325,11 +338,17 @@ class Player {
       (this.z + this.sizeZ/2 > colBox.z - colBox.sizeZ/2 &&
       this.z - this.sizeZ/2 < colBox.z + colBox.sizeZ/2) &&
       this.y - this.sizeY < colBox.y + colBox.sizeY/2) {
-      if (this.z > colBox.z + colBox.sizeZ / 2 || this.z < colBox.z - colBox.sizeZ / 2) {
-        this.z = this.lastPosition.z;
-      } 
-      if (this.x < colBox.x - colBox.sizeX / 2 || this.x > colBox.x + colBox.sizeX / 2) {
-        this.x = this.lastPosition.x;
+      if (!(colBox instanceof PushableBox)) {
+        if (this.z > colBox.z + colBox.sizeZ / 2 || this.z < colBox.z - colBox.sizeZ / 2) {
+          this.z = this.lastPosition.z;
+        } 
+        if (this.x < colBox.x - colBox.sizeX / 2 || this.x > colBox.x + colBox.sizeX / 2) {
+          this.x = this.lastPosition.x;
+        }
+      }
+      else {
+        colBox.x += this.x - this.lastPosition.x;
+        colBox.z += this.z - this.lastPosition.z;
       }
     }
     
@@ -482,6 +501,30 @@ class Box {
     translate(this.x, this.y, this.z);
     box(this.sizeX, this.sizeY, this.sizeZ);
     pop();
+  }
+}
+
+class PushableBox {
+  constructor(x, y, z, sizeX, sizeY, sizeZ) {
+    this.x = x;
+    this.y = y;
+    this.z = z;
+    this.sizeX = sizeX;
+    this.sizeY = sizeY;
+    this.sizeZ = sizeZ;
+    this.origY = y;
+  }
+
+  // Shows the box when called
+  display() {
+    push();
+    translate(this.x, this.y, this.z);
+    box(this.sizeX, this.sizeY, this.sizeZ);
+    pop();
+  }
+
+  update() {
+    // put gravity here pls
   }
 }
 
