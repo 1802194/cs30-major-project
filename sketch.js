@@ -196,14 +196,23 @@ function draw() {
     myFriend.isOnFloor = false;
 
     // Shows the boxes and checks if the player is colliding with them
+    myFriend.pushing = false;
+    for (let box = 0; box < myWonderfulPushBoxes.length; box++) {
+      myWonderfulPushBoxes[box].display();
+      // myWonderfulPushBoxes[box].update(); didnt work for some reason??
+      myWonderfulPushBoxes[box].lastPosition = {x: myWonderfulPushBoxes[box].x, y: myWonderfulPushBoxes[box].y, z: myWonderfulPushBoxes[box].z};
+      myWonderfulPushBoxes[box].isOnFloor = false;
+      myWonderfulPushBoxes[box].wallTouchingX = false;
+      myWonderfulPushBoxes[box].wallTouchingZ = false;
+      myFriend.checkCollision(myWonderfulPushBoxes[box]);
+    }
+
     for (let box = 0; box < myWonderfulBoxes.length; box++) {
       myWonderfulBoxes[box].display();
       myFriend.checkCollision(myWonderfulBoxes[box]);
-    }
-
-    for (let box = 0; box < myWonderfulPushBoxes.length; box++) {
-      myWonderfulPushBoxes[box].display();
-      myFriend.checkCollision(myWonderfulPushBoxes[box]);
+      for (let boxr = 0; boxr < myWonderfulPushBoxes.length; boxr++) {
+        myWonderfulPushBoxes[boxr].checkCollision(myWonderfulBoxes[box]);
+      }
     }
 
     for (let i = 0; i < allPortals.length; i++) {
@@ -247,6 +256,7 @@ class Player {
     this.lastPosition = {x: this.x, y: this.y, z: this.z};
     this.createElevator();
     this.elevator;
+    this.pushing = false;
   }
 
   createElevator() {
@@ -307,6 +317,11 @@ class Player {
       else {
         sprintSpeed = this.speed;
       }
+
+      if (this.pushing) {
+        sprintSpeed /= 2;
+      }
+
       // W
       if (keyIsDown(87)) {
         this.x += sin(angle)*sprintSpeed;
@@ -338,8 +353,8 @@ class Player {
       this.x - this.sizeX/2 < colBox.x + colBox.sizeX/2) &&
       (this.z + this.sizeZ/2 > colBox.z - colBox.sizeZ/2 &&
       this.z - this.sizeZ/2 < colBox.z + colBox.sizeZ/2)) {
-      this.y = colBox.y - (colBox.sizeY/2 + 5) - this.sizeY;
       this.isOnFloor = true;
+      this.y = colBox.y - (colBox.sizeY/2 + 5) - this.sizeY;
       if (colBox instanceof VertMoving) {
         this.y = colBox.y - (colBox.sizeY/2 + 5) - this.sizeY - 15;
       }
@@ -359,6 +374,13 @@ class Player {
         }
       }
       else {
+        this.pushing = true;
+        if (colBox.wallTouchingX) {
+          this.x = this.lastPosition.x;
+        }
+        if (colBox.wallTouchingZ) {
+          this.z = this.lastPosition.z;
+        }
         colBox.x += this.x - this.lastPosition.x;
         colBox.z += this.z - this.lastPosition.z;
       }
@@ -541,19 +563,66 @@ class PushableBox {
     this.sizeX = sizeX;
     this.sizeY = sizeY;
     this.sizeZ = sizeZ;
-    this.origY = y;
+    this.lastPosition = {x: this.x, y: this.y, z: this.z};
+    this.isOnFloor = true;
+    this.wallTouchingX = false;
+    this.wallTouchingZ = false;
+  }
+
+  update() {
+    this.lastPosition = {x: this.x, y: this.y, z: this.z};
   }
 
   // Shows the box when called
   display() {
     push();
-    translate(this.x, this.y, this.z);
+    translate(this.x, this.y + 55, this.z);
     box(this.sizeX, this.sizeY, this.sizeZ);
     pop();
   }
 
+  checkCollision(colBox) {
+    // collision code from player
+    if (this.y + this.sizeY < colBox.y - colBox.sizeY/2 &&
+      this.y + this.sizeY > colBox.y - colBox.sizeY/2 - 20 &&
+      (this.x + this.sizeX/2 > colBox.x - colBox.sizeX/2 && 
+      this.x - this.sizeX/2 < colBox.x + colBox.sizeX/2) &&
+      (this.z + this.sizeZ/2 > colBox.z - colBox.sizeZ/2 &&
+      this.z - this.sizeZ/2 < colBox.z + colBox.sizeZ/2)) {
+      console.log("i am touching the ground");
+      this.y = colBox.y - (colBox.sizeY/2 + 5) - this.sizeY;
+      this.isOnFloor = true;
+      if (colBox instanceof VertMoving) {
+        this.y = colBox.y - (colBox.sizeY/2 + 5) - this.sizeY - 15;
+      }
+    }
+    if (this.y + this.sizeY > colBox.y - colBox.sizeY/2 &&
+      (this.x + this.sizeX/2 > colBox.x - colBox.sizeX/2 && 
+      this.x - this.sizeX/2 < colBox.x + colBox.sizeX/2) &&
+      (this.z + this.sizeZ/2 > colBox.z - colBox.sizeZ/2 &&
+      this.z - this.sizeZ/2 < colBox.z + colBox.sizeZ/2) &&
+      this.y - this.sizeY < colBox.y + colBox.sizeY/2) {
+      if (!(colBox instanceof PushableBox)) {
+        if (this.z > colBox.z + colBox.sizeZ / 2 || this.z < colBox.z - colBox.sizeZ / 2) {
+          this.wallTouchingX = true;
+          this.z = this.lastPosition.z;
+        } 
+        if (this.x < colBox.x - colBox.sizeX / 2 || this.x > colBox.x + colBox.sizeX / 2) {
+          this.wallTouchingZ = false;
+          this.x = this.lastPosition.x;
+        }
+      }
+      else {
+        colBox.x += this.x - this.lastPosition.x;
+        colBox.z += this.z - this.lastPosition.z;
+      }
+    }
+  }
+
   update() {
-    // put gravity here pls
+    if (!this.isOnFloor) {
+      this.y += 10;
+    }
   }
 }
 
