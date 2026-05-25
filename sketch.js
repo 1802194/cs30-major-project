@@ -59,6 +59,7 @@ function preload() {
   starSound = loadSound("shine-10.mp3");
   portalSound = loadSound("teleport.mp3");
   elevatorSound = loadSound("elevator-ding.mp3");
+  jumpSound = loadSound("jump.mp3");
 }
 
 function setup() {
@@ -435,7 +436,7 @@ class Player {
       this.x - this.sizeX/2 < colJumpPad.x + colJumpPad.radius/2) &&
       (this.z + this.sizeZ/2 > colJumpPad.z - colJumpPad.radius/2 &&
       this.z - this.sizeZ/2 < colJumpPad.z + colJumpPad.radius/2)) {
-      portalSound.play();
+      jumpSound.play();
       this.y -= 5;
       this.isOnFloor = false;
       this.fallingspeed = -colJumpPad.power;
