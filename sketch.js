@@ -199,11 +199,9 @@ function draw() {
     myFriend.pushing = false;
     for (let box = 0; box < myWonderfulPushBoxes.length; box++) {
       myWonderfulPushBoxes[box].display();
-      // myWonderfulPushBoxes[box].update(); didnt work for some reason??
+      myWonderfulPushBoxes[box].update();
       myWonderfulPushBoxes[box].lastPosition = {x: myWonderfulPushBoxes[box].x, y: myWonderfulPushBoxes[box].y, z: myWonderfulPushBoxes[box].z};
       myWonderfulPushBoxes[box].isOnFloor = false;
-      myWonderfulPushBoxes[box].wallTouchingX = false;
-      myWonderfulPushBoxes[box].wallTouchingZ = false;
       myFriend.checkCollision(myWonderfulPushBoxes[box]);
     }
 
@@ -570,13 +568,16 @@ class PushableBox {
   }
 
   update() {
+    if (!this.isOnFloor) {
+      this.y += 10;
+    }
     this.lastPosition = {x: this.x, y: this.y, z: this.z};
   }
 
   // Shows the box when called
   display() {
     push();
-    translate(this.x, this.y + 55, this.z);
+    translate(this.x, this.y + 40, this.z);
     box(this.sizeX, this.sizeY, this.sizeZ);
     pop();
   }
@@ -589,13 +590,13 @@ class PushableBox {
       this.x - this.sizeX/2 < colBox.x + colBox.sizeX/2) &&
       (this.z + this.sizeZ/2 > colBox.z - colBox.sizeZ/2 &&
       this.z - this.sizeZ/2 < colBox.z + colBox.sizeZ/2)) {
-      console.log("i am touching the ground");
       this.y = colBox.y - (colBox.sizeY/2 + 5) - this.sizeY;
       this.isOnFloor = true;
       if (colBox instanceof VertMoving) {
         this.y = colBox.y - (colBox.sizeY/2 + 5) - this.sizeY - 15;
       }
     }
+
     if (this.y + this.sizeY > colBox.y - colBox.sizeY/2 &&
       (this.x + this.sizeX/2 > colBox.x - colBox.sizeX/2 && 
       this.x - this.sizeX/2 < colBox.x + colBox.sizeX/2) &&
@@ -604,11 +605,11 @@ class PushableBox {
       this.y - this.sizeY < colBox.y + colBox.sizeY/2) {
       if (!(colBox instanceof PushableBox)) {
         if (this.z > colBox.z + colBox.sizeZ / 2 || this.z < colBox.z - colBox.sizeZ / 2) {
-          this.wallTouchingX = true;
+          this.wallTouchingZ = true;
           this.z = this.lastPosition.z;
-        } 
+        }
         if (this.x < colBox.x - colBox.sizeX / 2 || this.x > colBox.x + colBox.sizeX / 2) {
-          this.wallTouchingZ = false;
+          this.wallTouchingX = true;
           this.x = this.lastPosition.x;
         }
       }
@@ -617,11 +618,15 @@ class PushableBox {
         colBox.z += this.z - this.lastPosition.z;
       }
     }
-  }
-
-  update() {
-    if (!this.isOnFloor) {
-      this.y += 10;
+    else {
+      if (!(colBox instanceof PushableBox)) {
+        if (!(this.z > colBox.z + colBox.sizeZ / 2 || this.z < colBox.z - colBox.sizeZ / 2) && (this.z !== this.lastPosition.z || this.x !== this.lastPosition.x)) {
+          this.wallTouchingZ = false;
+        }
+        if (!(this.x < colBox.x - colBox.sizeX / 2 || this.x > colBox.x + colBox.sizeX / 2) && (this.z !== this.lastPosition.z || this.x !== this.lastPosition.x)) {
+          this.wallTouchingX = false;
+        }
+      }
     }
   }
 }
