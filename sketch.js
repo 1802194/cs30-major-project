@@ -424,7 +424,7 @@ class Player {
   }
 
   checkPortal(colPortal) {
-    let topofMeBuddy = colPortal.y - colPortal.height - 150;
+    let topofMeBuddy = colPortal.y - colPortal.height;
     if (this.y + this.sizeY < colPortal.y + 10 &&  // checks if above the platform
       this.y + this.sizeY > topofMeBuddy && // checks if ontop of the portal and not just above in general
       (this.x + this.sizeX/2 > colPortal.x - colPortal.radius/2 && 
