@@ -248,6 +248,7 @@ class Player {
     this.sizeZ = sizeZ;
     this.speed = 3;
     this.fallingspeed = 8;
+    this.defaultfallingspeed = 8;
     this.airacceleration = 0.5;
     this.airtime = 0;
     this.isOnFloor = false;
@@ -352,6 +353,7 @@ class Player {
       (this.z + this.sizeZ/2 > colBox.z - colBox.sizeZ/2 &&
       this.z - this.sizeZ/2 < colBox.z + colBox.sizeZ/2)) {
       this.isOnFloor = true;
+      this.fallingspeed = this.defaultfallingspeed;
       this.y = colBox.y - (colBox.sizeY/2 + 5) - this.sizeY;
       if (colBox instanceof VertMoving) {
         this.y = colBox.y - (colBox.sizeY/2 + 5) - this.sizeY - 15;
