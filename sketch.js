@@ -375,14 +375,14 @@ class Player {
       }
       else {
         this.pushing = true;
+        colBox.x += this.x - this.lastPosition.x;
+        colBox.z += this.z - this.lastPosition.z;
         if (colBox.wallTouchingX) {
           this.x = this.lastPosition.x;
         }
         if (colBox.wallTouchingZ) {
           this.z = this.lastPosition.z;
         }
-        colBox.x += this.x - this.lastPosition.x;
-        colBox.z += this.z - this.lastPosition.z;
       }
     }
     
@@ -596,22 +596,24 @@ class PushableBox {
       this.y = colBox.y - (colBox.sizeY/2 + 5) - this.sizeY/2;
       this.isOnFloor = true;
       if (colBox instanceof VertMoving) {
-        this.y = colBox.y - (colBox.sizeY/2 + 5) - this.sizeY - 15;
+        this.y = colBox.y - (colBox.sizeY/2 + 5) - this.sizeY/2 - 15;
       }
     }
 
     if (this.y + this.sizeY/2 > colBox.y - colBox.sizeY/2 &&
-      (this.x + this.sizeX/2 > colBox.x - colBox.sizeX/2 && 
-      this.x - this.sizeX/2 < colBox.x + colBox.sizeX/2) &&
-      (this.z + this.sizeZ/2 > colBox.z - colBox.sizeZ/2 &&
-      this.z - this.sizeZ/2 < colBox.z + colBox.sizeZ/2) &&
+      (this.x + this.sizeX/2 > colBox.x - colBox.sizeX/2-1 && 
+      this.x - this.sizeX/2 < colBox.x + colBox.sizeX/2-1) &&
+      (this.z + this.sizeZ/2 > colBox.z - colBox.sizeZ/2-1 &&
+      this.z - this.sizeZ/2 < colBox.z + colBox.sizeZ/2-1) &&
       this.y - this.sizeY/2 < colBox.y + colBox.sizeY/2) {
       if (!(colBox instanceof PushableBox)) {
         if (this.z > colBox.z + colBox.sizeZ / 2 || this.z < colBox.z - colBox.sizeZ / 2) {
+          console.log("i touch z wall");
           this.wallTouchingZ = true;
           this.z = this.lastPosition.z;
         }
         if (this.x < colBox.x - colBox.sizeX / 2 || this.x > colBox.x + colBox.sizeX / 2) {
+          console.log("i touch x wall");
           this.wallTouchingX = true;
           this.x = this.lastPosition.x;
         }
@@ -623,10 +625,13 @@ class PushableBox {
     }
     else {
       if (!(colBox instanceof PushableBox)) {
-        if (!(this.z > colBox.z + colBox.sizeZ / 2 || this.z < colBox.z - colBox.sizeZ / 2) && (this.z !== this.lastPosition.z || this.x !== this.lastPosition.x)) {
+        if (!(this.z > colBox.z + colBox.sizeZ / 2 || this.z < colBox.z - colBox.sizeZ / 2)) {
+          console.log("aint touchin NO z walls");
           this.wallTouchingZ = false;
+
         }
-        if (!(this.x < colBox.x - colBox.sizeX / 2 || this.x > colBox.x + colBox.sizeX / 2) && (this.z !== this.lastPosition.z || this.x !== this.lastPosition.x)) {
+        if (!(this.x < colBox.x - colBox.sizeX / 2 || this.x > colBox.x + colBox.sizeX / 2)) {
+          console.log("aint touchin NO x walls");
           this.wallTouchingX = false;
         }
       }
