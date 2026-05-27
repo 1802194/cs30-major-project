@@ -577,7 +577,7 @@ class PushableBox {
   // Shows the box when called
   display() {
     push();
-    translate(this.x, this.y + 40, this.z);
+    translate(this.x, this.y + this.sizeY/2, this.z);
     box(this.sizeX, this.sizeY, this.sizeZ);
     pop();
   }
