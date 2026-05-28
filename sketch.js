@@ -184,8 +184,8 @@ function draw() {
     if (mainMenu) {
       keepStagnantCamera();
     }
-    orbitControl();
   }
+  orbitControl();
 
   // Controls the player
   if (myFriend !== undefined) {
@@ -507,8 +507,16 @@ class Elevator {
       myWonderfulBoxes.push(this.pieces[piece].piece);
     }
     this.moving = true;
+    this.cameraIntendedX = this.x;
+    this.cameraIntendedY = this.origY;
+    this.cameraIntendedZ = this.z;
+
+    // intro cam
+    this.cameraIntroX = this.x+1000;
+    this.cameraIntroY = -80;
+    this.cameraIntroZ = this.z;
+
     cam.setPosition(this.x+1000, -80, this.z);
-    cam.lookAt(this.x, this.origY, this.z);
     p5.tween.manager
       .addTween(this, 'tween1')
       .addMotions([{ key: 'y', target: this.origY}], 1000, 'easeOutQuart')
@@ -518,12 +526,46 @@ class Elevator {
 
   killer() {
     this.moving = false;
-    intro_playing = false;
     elevatorSound.play();
+
+    p5.tween.manager
+      .addTween(this, 'tween3')
+      .addMotions([{ key: 'cameraIntroX', target: 1695}], 1000, 'easeOutQuart')
+      .startTween();
+    p5.tween.manager
+      .addTween(this, 'tween3')
+      .addMotions([{ key: 'cameraIntroY', target: -1000}], 1000, 'easeOutQuart')
+      .startTween();
+    p5.tween.manager
+      .addTween(this, 'tween3')
+      .addMotions([{ key: 'cameraIntroZ', target: 1780}], 1000, 'easeOutQuart')
+      .startTween();
+
+    p5.tween.manager
+      .addTween(this, 'tween2')
+      .addMotions([{ key: 'cameraIntendedX', target: 0}], 1700, 'easeOutQuart')
+      .startTween();
+    p5.tween.manager
+      .addTween(this, 'tween3')
+      .addMotions([{ key: 'cameraIntendedY', target: 0}], 2000, 'easeOutQuart')
+      .startTween();
+    p5.tween.manager
+      .addTween(this, 'tween4')
+      .addMotions([{ key: 'cameraIntendedZ', target: 0}], 2000, 'easeOutQuart')
+      .startTween()
+      .onEnd(() => this.set_to_cam());
     // sound doesn't play when refreshing the page for some reason but does work when loading the level otherwise
   }
 
+  set_to_cam() {
+    intro_playing = false;
+  }
+
   display() {
+    if (intro_playing) {
+      cam.setPosition(this.cameraIntroX, this.cameraIntroY, this.cameraIntroZ);
+    }
+    cam.lookAt(this.cameraIntendedX, this.cameraIntendedY, this.cameraIntendedZ);
     for (let piece in this.pieces) {
       let offset = myWonderfulBoxes[this.pieces[piece].indexer].origY - this.lowestY;
       myWonderfulBoxes[this.pieces[piece].indexer].y = this.y+offset;
@@ -608,12 +650,12 @@ class PushableBox {
       this.y - this.sizeY/2 < colBox.y + colBox.sizeY/2) {
       if (!(colBox instanceof PushableBox)) {
         if (this.z > colBox.z + colBox.sizeZ / 2 || this.z < colBox.z - colBox.sizeZ / 2) {
-          console.log("i touch z wall");
+          //console.log("i touch z wall");
           this.wallTouchingZ = true;
           this.z = this.lastPosition.z;
         }
         if (this.x < colBox.x - colBox.sizeX / 2 || this.x > colBox.x + colBox.sizeX / 2) {
-          console.log("i touch x wall");
+          //console.log("i touch x wall");
           this.wallTouchingX = true;
           this.x = this.lastPosition.x;
         }
@@ -626,12 +668,12 @@ class PushableBox {
     else {
       if (!(colBox instanceof PushableBox)) {
         if (!(this.z > colBox.z + colBox.sizeZ / 2 || this.z < colBox.z - colBox.sizeZ / 2)) {
-          console.log("aint touchin NO z walls");
+          //console.log("aint touchin NO z walls");
           this.wallTouchingZ = false;
 
         }
         if (!(this.x < colBox.x - colBox.sizeX / 2 || this.x > colBox.x + colBox.sizeX / 2)) {
-          console.log("aint touchin NO x walls");
+          //console.log("aint touchin NO x walls");
           this.wallTouchingX = false;
         }
       }
