@@ -374,15 +374,20 @@ class Player {
         }
       }
       else {
+        this.continue = true;
         if (colBox.wallTouchingX) {
           this.x = this.lastPosition.x;
+          this.continue = false;
         }
         if (colBox.wallTouchingZ) {
           this.z = this.lastPosition.z;
+          this.continue = false;
         }
-        this.pushing = true;
-        colBox.x += this.x - this.lastPosition.x;
-        colBox.z += this.z - this.lastPosition.z;
+        if (this.continue === true) {
+          this.pushing = true;
+          colBox.x += this.x - this.lastPosition.x;
+          colBox.z += this.z - this.lastPosition.z;
+        }
       }
     }
     
