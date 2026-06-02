@@ -374,20 +374,9 @@ class Player {
         }
       }
       else {
-        this.continue = true;
-        if (colBox.wallTouchingX) {
-          this.x = this.lastPosition.x;
-          this.continue = false;
-        }
-        if (colBox.wallTouchingZ) {
-          this.z = this.lastPosition.z;
-          this.continue = false;
-        }
-        if (this.continue === true) {
-          this.pushing = true;
-          colBox.x += this.x - this.lastPosition.x;
-          colBox.z += this.z - this.lastPosition.z;
-        }
+        this.pushing = true;
+        colBox.x += this.x - this.lastPosition.x;
+        colBox.z += this.z - this.lastPosition.z;
       }
     }
     
@@ -647,6 +636,9 @@ class PushableBox {
       }
     }
 
+    this.wallTouchingX = false;
+    this.wallTouchingZ = false;
+
     if (this.y + this.sizeY/2 > colBox.y - colBox.sizeY/2 &&
       (this.x + this.sizeX/2 > colBox.x - colBox.sizeX/2-1 && 
       this.x - this.sizeX/2 < colBox.x + colBox.sizeX/2-1) &&
@@ -654,35 +646,22 @@ class PushableBox {
       this.z - this.sizeZ/2 < colBox.z + colBox.sizeZ/2-1) &&
       this.y - this.sizeY/2 < colBox.y + colBox.sizeY/2) {
       if (!(colBox instanceof PushableBox)) {
-        if (this.z > colBox.z + colBox.sizeZ / 2 || this.z < colBox.z - colBox.sizeZ / 2) {
+        if (this.z+1 > colBox.z-1 + colBox.sizeZ / 2 || this.z-1 < colBox.z+1 - colBox.sizeZ / 2) {
           console.log("i touch z wall");
           this.wallTouchingZ = true;
+          myFriend.z = myFriend.lastPosition.z; // i rly didnt wanna do this but im getting desperate
           this.z = this.lastPosition.z;
         }
-        if (this.x < colBox.x - colBox.sizeX / 2 || this.x > colBox.x + colBox.sizeX / 2) {
+        if (this.x-1 < colBox.x+1 - colBox.sizeX / 2 || this.x+1 > colBox.x-1 + colBox.sizeX / 2) {
           console.log("i touch x wall");
           this.wallTouchingX = true;
+          myFriend.x = myFriend.lastPosition.x;
           this.x = this.lastPosition.x;
         }
       }
       else {
         colBox.x += this.x - this.lastPosition.x;
         colBox.z += this.z - this.lastPosition.z;
-      }
-    }
-    else {
-      if (!(colBox instanceof PushableBox)) {
-        if (this.lastPosition.x !== this.x && this.lastPosition.z !== this.z) {
-          if (!(this.z > colBox.z + colBox.sizeZ / 2 || this.z < colBox.z - colBox.sizeZ / 2)) {
-            console.log("aint touchin NO z walls");
-            this.wallTouchingZ = false;
-
-          }
-          if (!(this.x < colBox.x - colBox.sizeX / 2 || this.x > colBox.x + colBox.sizeX / 2)) {
-            console.log("aint touchin NO x walls");
-            this.wallTouchingX = false;
-          }
-        }
       }
     }
   }
