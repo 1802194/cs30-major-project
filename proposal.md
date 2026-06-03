@@ -7,7 +7,7 @@ Captain Toad
 - Sound effects ✔
 - Actual end goal item ✔
 - Doors/teleport ✔
-- Enemies/Obsticles
+- Enemies/Obsticles ✔
 - Menu
 
 ## Nice to Have
