@@ -8,7 +8,7 @@
 - Actual end goal item ✔
 - Doors/teleport ✔
 - Enemies/Obsticles ✔
-- Menu
+- Menu ✔
 
 ## Nice to Have
 - 3D player model
