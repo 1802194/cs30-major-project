@@ -146,7 +146,7 @@ function keepStagnantCamera() {
 }
 
 function draw() {
-  background(220);
+  background(255);
   if (!musicLoop) {
     backgroundMusic.loop();
     musicLoop = true;
