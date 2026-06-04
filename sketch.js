@@ -86,6 +86,7 @@ function onLevelLoad() {
   myWonderfulPushBoxes = [];
   allStars = [];
   allPortals = [];
+  allJumpPads = [];
 
   let badword = stage["pieces"];
   // Checks the json for the level to know what objects need to be added
