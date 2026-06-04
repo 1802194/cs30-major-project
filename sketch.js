@@ -74,7 +74,11 @@ function setup() {
 }
 
 async function createLevel() {
-  stage = loadJSON("levels/level"+level+".json", onLevelLoad);
+  stage = loadJSON("levels/level"+level+".json", onLevelLoad, returnToMenu);
+}
+
+function returnToMenu() {
+  window.location.href = "index.html";
 }
 
 function onLevelLoad() {
@@ -480,6 +484,7 @@ class Player {
         colStar.collected = true;
         collectedStars ++;
         if (collectedStars === starCount) {
+          level += 1;
           createLevel(); 
         }
       }
@@ -624,6 +629,7 @@ class PushableBox {
     push();
     // idk why this offse works im the wrong girl to ask - starzz
     translate(this.x, this.y+2, this.z);
+    fill(245, 122, 138);
     box(this.sizeX, this.sizeY, this.sizeZ);
     pop();
   }
