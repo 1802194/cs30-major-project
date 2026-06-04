@@ -25,6 +25,7 @@ let mainMenu = false;
 let camStagnantionEye;
 let camStagnantionCenter;
 let textBuffer;
+let musicLoop = false;
 
 // - reused wait function from my Grid Game - [aurora [starzz]]
 const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms));
@@ -60,6 +61,7 @@ function preload() {
   portalSound = loadSound("teleport.mp3");
   elevatorSound = loadSound("elevator-ding.mp3");
   jumpSound = loadSound("jump.mp3");
+  backgroundMusic = loadSound("Serenity.mp3");
 }
 
 function setup() {
@@ -144,6 +146,10 @@ function keepStagnantCamera() {
 
 function draw() {
   background(220);
+  if (!musicLoop) {
+    backgroundMusic.loop();
+    musicLoop = true;
+  }
   if (mainMenu) {
     // trying to get that text to show up, but no matter what I do, it wont. and the background of the frame buffer won't become translucent for the life of me.
     // i'll fix what I can tomorrow. it's 1am.

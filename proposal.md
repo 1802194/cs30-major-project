@@ -2,7 +2,7 @@
 Captain Toad
 
 ## Needs to Have
-- 2-3 levels
+- 2-3 levels ✔
 - 3D maps ✔
 - Sound effects ✔
 - Actual end goal item ✔
@@ -14,7 +14,7 @@ Captain Toad
 - 3D player model
 - Player animations
 - moving platforms ✔
-- Music
+- Music ✔
 - More Levels?
 - Fishing Minigame (Tyler's Idea not mine leave me out of this)
 - Achievements
