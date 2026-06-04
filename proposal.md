@@ -1,5 +1,5 @@
 # Project Description
-Captain Toad
+3D puzzle game where the player must navigate each area to collect the stars placed around
 
 ## Needs to Have
 - 2-3 levels ✔
