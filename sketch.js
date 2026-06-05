@@ -1,13 +1,7 @@
-// Project Title
-// Your Name
-// Date
-//
-// Extra for Experts:
-// - describe what you did to take this project "above and beyond"
+// CS-30 Capstone Coding Project
+// Aurora and Tyler
+// June 12, 2026
 
-// can we not add the ceilings? it just kinda. doesn't work with the camera, hard to manuvear.
-
-//https://threejs.org/docs/#AnimationMixer
 let stage = {};
 let level = 1;
 let myWonderfulBoxes = [];
@@ -21,11 +15,12 @@ let showHitboxes = false;
 let starCount = 0;
 let collectedStars = 0;
 let intro_playing = true;
-let mainMenu = false;
+let pauseMenu = false;
 let camStagnantionEye;
 let camStagnantionCenter;
 let textBuffer;
 let musicLoop = false;
+let menuText;
 
 // - reused wait function from my Grid Game - [aurora [starzz]]
 const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms));
@@ -34,10 +29,10 @@ function keyPressed() {
   if (key === "q") {
     saveJSON(stage);
   }
-  if (key === "e") {
+  if (key === "r") {
     createLevel();
   }
-  if (key === "r") {
+  if (key === "n") {
     level += 1;
     createLevel();
   }
@@ -45,13 +40,10 @@ function keyPressed() {
     showHitboxes = !showHitboxes;
   }
   if (key === "p") {
-    mainMenu = !mainMenu;
+    pauseMenu = !pauseMenu;
     camStagnantionCenter = {x : cam.centerX, y : cam.centerY, z : cam.centerZ};
     camStagnantionEye = {x : cam.eyeX, y : cam.eyeY, z : cam.eyeZ};
     // note from starzz (aurora), we didnt need to recreate the level everytime we were in the main menu, did something better instead! p.s, fixed the text bug c":
-   
-    // display: hidden & display: block are supposed to help with making the text disappear/reappear but I haven't figured out how to do that yet
-    // -Tyler
   }
 }
 
@@ -69,7 +61,8 @@ function setup() {
   createLevel();
   textFont(font);
   cam = _renderer._curCamera; 
-
+  menuText = createDiv('Press [P] To Resume.');
+  
   textBuffer = createFramebuffer();
 }
 
@@ -85,51 +78,51 @@ function onLevelLoad() {
   intro_playing = true;
   starCount = 0;
   collectedStars = 0;
-  // This array stores all of the objects present on he field
+  // This array stores all of the objects present on the field
   myWonderfulBoxes = [];
   myWonderfulPushBoxes = [];
   allStars = [];
   allPortals = [];
   allJumpPads = [];
 
-  let badword = stage["pieces"];
+  let objects = stage["pieces"];
   // Checks the json for the level to know what objects need to be added
-  for (let piece = 0; piece < badword.length; piece++) {
+  for (let piece = 0; piece < objects.length; piece++) {
     // Creates a rectangular prism based on the position and dimensions in the json
-    if (badword[piece][0] === "box") {
-      let boxexclaimationmark = new Box(badword[piece][1],badword[piece][2],badword[piece][3],badword[piece][4],badword[piece][5],badword[piece][6]);
+    if (objects[piece][0] === "box") {
+      let boxexclaimationmark = new Box(objects[piece][1],objects[piece][2],objects[piece][3],objects[piece][4],objects[piece][5],objects[piece][6]);
       myWonderfulBoxes.push(boxexclaimationmark);
     }
-    else if (badword[piece][0] === "movingplat_vertical") {
-      let boxexclaimationmark = new VertMoving(badword[piece][1],badword[piece][2],badword[piece][3],badword[piece][4],badword[piece][5],badword[piece][6]);
+    else if (objects[piece][0] === "movingplat_vertical") {
+      let boxexclaimationmark = new VertMoving(objects[piece][1],objects[piece][2],objects[piece][3],objects[piece][4],objects[piece][5],objects[piece][6]);
       myWonderfulBoxes.push(boxexclaimationmark);
     }
-    else if (badword[piece][0] === "pushableBox") {
-      let boxexclaimationmark = new PushableBox(badword[piece][1],badword[piece][2],badword[piece][3],badword[piece][4],badword[piece][5],badword[piece][6]);
+    else if (objects[piece][0] === "pushableBox") {
+      let boxexclaimationmark = new PushableBox(objects[piece][1],objects[piece][2],objects[piece][3],objects[piece][4],objects[piece][5],objects[piece][6]);
       myWonderfulPushBoxes.push(boxexclaimationmark);
     }
-    else if (badword[piece][0] === "player_spawn") {
+    else if (objects[piece][0] === "player_spawn") {
       // Determines the player's spawn point
       // could've done a for loop for this but.... ehhhhhhhhhhhh im lazy ill do it later (if i remember) - [starzz (aurora)]
       // update: i tried, and the entire game broke. i will come back to this cuz it's definitely just me not having coded in awhile. i miss you, coding.
-      player_spawn_cords[0] = badword[piece][1];
-      player_spawn_cords[1] = badword[piece][2];
-      player_spawn_cords[2] = badword[piece][3];
+      player_spawn_cords[0] = objects[piece][1];
+      player_spawn_cords[1] = objects[piece][2];
+      player_spawn_cords[2] = objects[piece][3];
     }
-    else if (badword[piece][0] === "star") {
+    else if (objects[piece][0] === "star") {
       // Creates a star at the specified position to be collected by the player
       starCount += 1;
-      let newStar = new Star(badword[piece][1],badword[piece][2],badword[piece][3],badword[piece][4]);
+      let newStar = new Star(objects[piece][1],objects[piece][2],objects[piece][3],objects[piece][4]);
       allStars.push(newStar);
     }
-    else if (badword[piece][0] === "portal") {
+    else if (objects[piece][0] === "portal") {
       // Creates a portal
-      let newPortal = new Portal(badword[piece][1],badword[piece][2],badword[piece][3],badword[piece][4],badword[piece][5],badword[piece][6]);
+      let newPortal = new Portal(objects[piece][1],objects[piece][2],objects[piece][3],objects[piece][4],objects[piece][5],objects[piece][6]);
       allPortals.push(newPortal);
     }
-    else if (badword[piece][0] === "jump") {
+    else if (objects[piece][0] === "jump") {
       // Creates a jump pad
-      let newJumpPad = new JumpPad(badword[piece][1],badword[piece][2],badword[piece][3],badword[piece][4]);
+      let newJumpPad = new JumpPad(objects[piece][1],objects[piece][2],objects[piece][3],objects[piece][4]);
       allJumpPads.push(newJumpPad);
     }
   }
@@ -155,22 +148,9 @@ function draw() {
     backgroundMusic.loop();
     musicLoop = true;
   }
-  if (mainMenu) {
-    // trying to get that text to show up, but no matter what I do, it wont. and the background of the frame buffer won't become translucent for the life of me.
-    // i'll fix what I can tomorrow. it's 1am.
-    // - starzz
-    // This causes the text to show up but I can't get the font to work
-    // I also couldn't get it to go away when pressing p again
-    // - Tyler
-    let menuText = createDiv('Press [P] To Resume.');
+  if (pauseMenu) {
+    menuText.show();
     menuText.position(windowWidth/2, windowHeight/2);
-    // textBuffer.begin();
-    // background(0);
-    // textAlign(CENTER, CENTER);
-    // fill(255);
-    // textSize(10);
-    // text('Press [P] To Resume.', 0, 0, 0, 0);
-    // textBuffer.end();
 
     push();
     // pan and tilt are built in names for p5, had to change them
@@ -190,9 +170,13 @@ function draw() {
     image(textBuffer, -width/2, -height/2);
     pop();
   }
+  else {
+    // Hides the pause menu text when unpaused
+    menuText.hide();
+  }
   // Allows camera control
   if (!intro_playing) {
-    if (mainMenu) {
+    if (pauseMenu) {
       keepStagnantCamera();
     }
   }
@@ -201,7 +185,7 @@ function draw() {
   // Controls the player
   if (myFriend !== undefined) {
     myFriend.display();
-    if (!mainMenu) {
+    if (!pauseMenu) {
       myFriend.update();
     }
     myFriend.isOnFloor = false;
@@ -417,16 +401,6 @@ class Player {
       translate(colBox.x, colBox.y, colBox.z);
       box(colBox.sizeX+1, colBox.sizeY, colBox.sizeZ-1);
       pop();
-      // push();
-      // fill("coral");
-      // translate(colBox.x, colBox.y - colBox.sizeY/2 - 20, colBox.z);
-      // box(colBox.sizeX, 1, colBox.sizeZ);
-      // pop();
-      push();
-      fill("lavender");
-      translate(this.x, colBox.y - colBox.sizeY/2 - this.sizeY, this.z);
-      box(10, 10, 10);
-      pop();
     }
   }
 
@@ -444,7 +418,6 @@ class Player {
       this.z = colPortal.z2;
       this.fallingspeed = 0;
       this.airtime = 0;
-      //this.airacceleration = 0;
     }
     if (showHitboxes) {
       push();
@@ -468,7 +441,6 @@ class Player {
       this.isOnFloor = false;
       this.fallingspeed = -colJumpPad.power;
       this.airtime = 0;
-      //this.airacceleration = -colJumpPad.power;
     }
   }
 
@@ -577,8 +549,6 @@ class Elevator {
       myWonderfulBoxes[this.pieces[piece].indexer].y = this.y+offset;
     }
     push();
-    //translate(this.x, this.y, this.z);
-    //box(100, 100, 100);
     pop();
   }
 }
